@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "banks" ALTER COLUMN "code" SET DATA TYPE TEXT;

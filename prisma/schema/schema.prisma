@@ -1,0 +1,71 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["prismaSchemaFolder"]
+}
+
+model global_configuration {
+  id          Int     @id @default(autoincrement())
+  key         String  @unique
+  value       String
+  description String
+  is_active   Boolean @default(true)
+}
+
+enum roles_options {
+  ADMIN
+  ACCOUNTING
+  CLIENT
+}
+
+enum type_of_person {
+  NATURAL
+  JURIDIC
+}
+
+enum payment_status {
+  SUCCESS
+  FAILED
+}
+
+enum currencies {
+  USD
+  VES
+}
+
+enum isp_commission_type {
+  CLIENT_ASSUMES
+  ISP_ASSUMES
+}
+
+enum bank_products_name {
+  C2P
+  B2P
+  PAY_BUTTON
+  VERIFICATION_API
+}
+
+enum balance_status {
+  AVAILABLE
+  PARTIALLY_USED
+  DEPLETED
+  RETURNED
+}
+
+enum payment_type {
+  BALANCE
+  BANK_TRANSACTION
+}
+
+enum payment_category {
+  BALANCE
+  CREDIT_CARD
+  DEBIT_CARD
+  PAYMENT_LINK
+  BANK_TRANSFER
+  CRYPTO
+}

@@ -1,0 +1,69 @@
+model user {
+  id               Int             @id @default(autoincrement())
+  email            String?         @unique
+  role             roles_options
+  is_authenticated Boolean         @default(true)
+  last_login       DateTime?
+  is_active        Boolean         @default(true)
+  is_deleted       Boolean         @default(false)
+  password         String?
+  updated_at       DateTime?
+  created_at       DateTime?
+  admin_profile    admin_profile?
+  client_profile   client_profile?
+  session          session[]
+}
+
+model session {
+  id        String   @id
+  userId    Int
+  expiresAt DateTime
+
+  user user @relation(references: [id], fields: [userId], onDelete: Cascade)
+}
+
+model admin_profile {
+  id               Int                   @id @default(autoincrement())
+  user_id          Int                   @unique
+  user             user                  @relation(fields: [user_id], references: [id])
+  isp_id           Int?
+  isp              isp?                  @relation(fields: [isp_id], references: [id])
+  name             String?
+  phone            String?
+  invoice_payments invoice_payments[]
+  configuration    admin_configuration[]
+}
+
+model admin_configuration {
+  id                      Int           @id @default(autoincrement())
+  admin_profile_id        Int
+  admin_profile           admin_profile @relation(fields: [admin_profile_id], references: [id])
+  notification_preference String?
+  is_active               Boolean       @default(true)
+}
+
+model client_profile {
+  id                      Int                    @id @default(autoincrement())
+  network_manager_user_id Int                    @unique
+  user_id                 Int                    @unique
+  user                    user                   @relation(fields: [user_id], references: [id])
+  isp_id                  Int?
+  isp                     isp?                   @relation(fields: [isp_id], references: [id])
+  name                    String?
+  dni                     String?                @unique
+  phone                   String?
+  address                 String?
+  type_of_person          type_of_person
+  invoice_payments        invoice_payments[]
+  configuration           client_configuration[]
+  client_balance          client_balance[]
+}
+
+model client_configuration {
+  id                      Int            @id @default(autoincrement())
+  client_profile_id       Int
+  client_profile          client_profile @relation(fields: [client_profile_id], references: [id])
+  transaction_limit       Float?
+  notification_preference String?
+  is_active               Boolean        @default(true)
+}

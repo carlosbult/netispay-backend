@@ -1,0 +1,43 @@
+model isp {
+  id                 Int                 @id @default(autoincrement())
+  name               String
+  email              String?             @unique
+  rif                String?             @unique
+  client_profile     client_profile[]
+  admin_profile      admin_profile[]
+  configurations     isp_configuration[]
+  network_manager_id Int?
+  network_manager    network_manager?    @relation(fields: [network_manager_id], references: [id])
+  is_active          Boolean             @default(true)
+  created_at         DateTime            @default(now())
+  updated_at         DateTime?
+}
+
+model network_manager {
+  id         Int     @id @default(autoincrement())
+  name       String  @unique
+  api_url    String?
+  api_key    String?
+  api_secret String?
+  isp        isp[]
+}
+
+model isp_configuration {
+  id                    Int                 @id @default(autoincrement())
+  isp_id                Int
+  isp                   isp                 @relation(fields: [isp_id], references: [id])
+  igtf_rate             Float               @default(3)
+  iva_rate              Float               @default(16)
+  add_iva_ves           Boolean             @default(false)
+  add_iva_usd           Boolean             @default(false)
+  add_igtf              Boolean             @default(false)
+  commission_type       isp_commission_type
+  allow_partial_payment Boolean             @default(false)
+  instance_subdomain    String?
+  instance_ip           String?
+  instance_token        String?
+  admin_software_token  String?
+  is_active             Boolean             @default(true)
+  created_at            DateTime            @default(now())
+  updated_at            DateTime            @updatedAt
+}

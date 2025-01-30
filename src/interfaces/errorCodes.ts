@@ -1,0 +1,84 @@
+export enum ErrorCode {
+  // Errores generales
+  INTERNAL_SERVER_ERROR = 'GE001',
+  BAD_REQUEST = 'GE002',
+  UNAUTHORIZED = 'GE003',
+  FORBIDDEN = 'GE004',
+  NOT_FOUND = 'GE005',
+  VALIDATION_ERROR = 'GE006',
+
+  // Errores relacionados con usuarios
+  USER_NOT_FOUND = 'US001',
+  USER_ALREADY_EXISTS = 'US002',
+  EMAIL_ALREADY_EXISTS = 'US003',
+  USERNAME_ALREADY_EXISTS = 'US004',
+  INVALID_CREDENTIALS = 'US005',
+  USER_CREATION_ERROR = 'US006',
+  USER_UPDATE_ERROR = 'US007',
+  USER_DELETION_ERROR = 'US008',
+  USER_ACTIVATION_ERROR = 'US009',
+
+  // Errores relacionados con ISP
+  ISP_NOT_FOUND = 'ISP001',
+  NO_ACTIVE_ISP = 'ISP002',
+  ISP_CREATION_ERROR = 'ISP003',
+  ISP_UPDATE_ERROR = 'ISP004',
+
+  // Errores relacionados con Network Managers
+  NETWORK_MANAGER_NOT_SUPPORTED = 'NM001',
+  NETWORK_MANAGER_NOT_REGISTERED = 'NM002',
+  NETWORK_MANAGER_CONNECTION_ERROR = 'NM003',
+
+  // Errores relacionados con facturas
+  INVOICE_NOT_FOUND = 'INV001',
+  INVOICE_CREATION_ERROR = 'INV002',
+  INVOICE_UPDATE_ERROR = 'INV003',
+  INVOICE_PAYMENT_ERROR = 'INV004',
+
+  // Errores relacionados con pagos
+  PAYMENT_PROCESSING_ERROR = 'PAY001',
+  INVALID_PAYMENT_METHOD = 'PAY002',
+  INSUFFICIENT_FUNDS = 'PAY003',
+
+  // Errores relacionados con servicios
+  SERVICE_ACTIVATION_ERROR = 'SRV001',
+  SERVICE_SUSPENSION_ERROR = 'SRV002',
+  SERVICE_NOT_FOUND = 'SRV003',
+
+  // Errores relacionados con autenticación y autorización
+  TOKEN_EXPIRED = 'AUTH001',
+  INVALID_TOKEN = 'AUTH002',
+  INSUFFICIENT_PERMISSIONS = 'AUTH003',
+
+  // Errores relacionados con la base de datos
+  DATABASE_CONNECTION_ERROR = 'DB001',
+  DATABASE_QUERY_ERROR = 'DB002',
+
+  // Errores relacionados con validación de datos
+  INVALID_EMAIL_FORMAT = 'VAL001',
+  INVALID_PHONE_FORMAT = 'VAL002',
+  INVALID_DATE_FORMAT = 'VAL003',
+  REQUIRED_FIELD_MISSING = 'VAL004',
+
+  // Errores relacionados con operaciones de archivo
+  FILE_UPLOAD_ERROR = 'FILE001',
+  FILE_NOT_FOUND = 'FILE002',
+  INVALID_FILE_TYPE = 'FILE003',
+
+  // Errores relacionados con límites y cuotas
+  RATE_LIMIT_EXCEEDED = 'LIM001',
+  QUOTA_EXCEEDED = 'LIM002',
+
+  // Errores relacionados con integraciones externas
+  EXTERNAL_API_ERROR = 'EXT001',
+  EXTERNAL_SERVICE_UNAVAILABLE = 'EXT002',
+
+  DUPLICATE_TRANSACTION = 'DPLTRA',
+
+  // Errores relacionados con balances
+  BALANCE_NOT_FOUND = 'BAL001',
+  BALANCE_MOVEMENT_ERROR = 'BAL002',
+  BALANCE_APPLICATION_ERROR = 'BAL003',
+  INSUFFICIENT_BALANCE = 'BAL004',
+  NO_AVAILABLE_BALANCE = 'BAL005',
+}

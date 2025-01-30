@@ -1,0 +1,133 @@
+model banks {
+  id           Int            @id @default(autoincrement())
+  name         String
+  code         String         @unique
+  bank_product bank_product[]
+}
+
+model bank_product {
+  id               Int                          @id @default(autoincrement())
+  bank_id          Int
+  banks            banks                        @relation(fields: [bank_id], references: [id])
+  name             bank_products_name
+  payment_category payment_category?
+  is_active        Boolean                      @default(false)
+  api_url          String?
+  api_key          String?
+  api_secret       String?
+  transactions     transactions[]
+  configurations   bank_product_configuration[]
+}
+
+model bank_product_configuration {
+  id                   Int          @id @default(autoincrement())
+  bank_product_id      Int
+  bank_product         bank_product @relation(fields: [bank_product_id], references: [id])
+  description          String?
+  bank_commission_rate Float        @default(0)
+  bank_operation_rate  Float?       @default(0)
+  currency             currencies
+}
+
+model dolar_rate {
+  id            Int            @id @default(autoincrement())
+  bcv_rate      Float
+  parallel_rate Float
+  created_at    DateTime       @default(now())
+  transactions  transactions[]
+}
+
+model transactions {
+  id               Int                @id @default(autoincrement())
+  bank_product_id  Int
+  bank_product     bank_product       @relation(fields: [bank_product_id], references: [id])
+  dolar_rate_id    Int
+  dolar_rate       dolar_rate         @relation(fields: [dolar_rate_id], references: [id])
+  bank_reference   String?
+  intermediate_id  String?
+  amount           Float              @map("amount")
+  currency         currencies
+  payment_status   payment_status
+  error_code       String?
+  error_message    String?
+  bank_response    Json
+  month_year       String
+  created_at       DateTime           @default(now())
+  invoice_payments invoice_payments[]
+  client_balance   client_balance[]
+}
+
+model commission_tiers {
+  id                         Int                          @id @default(autoincrement())
+  min_transactions           Int
+  max_transactions           Int
+  operation_cost             Float
+  is_active                  Boolean                      @default(true)
+  monthly_commission_summary monthly_commission_summary[]
+}
+
+model monthly_commission_summary {
+  id                   Int              @id @default(autoincrement())
+  commission_tier_id   Int
+  commission_tiers     commission_tiers @relation(fields: [commission_tier_id], references: [id])
+  month_year           String
+  total_transactions   Int
+  total_operation_cost Float
+  created_at           DateTime         @default(now())
+}
+
+model invoice_payments {
+  id                Int          @id @default(autoincrement())
+  invoice_id        String
+  transaction_id    Int
+  network_manager   String
+  payment_type      payment_type
+  amount            Float
+  invoice_data      Json
+  client_profile_id Int?
+  admin_profile_id  Int?
+  created_at        DateTime     @default(now())
+
+  client_profile   client_profile?    @relation(fields: [client_profile_id], references: [id])
+  admin_profile    admin_profile?     @relation(fields: [admin_profile_id], references: [id])
+  balance_movement balance_movement[]
+  transactions     transactions?      @relation(fields: [transactionsId], references: [id])
+  transactionsId   Int?
+
+  @@index([invoice_id])
+  @@index([client_profile_id])
+  @@index([admin_profile_id])
+}
+
+model client_balance {
+  id                Int            @id @default(autoincrement())
+  transaction_id    Int
+  client_profile_id Int
+  initial_amount    Float
+  current_amount    Float
+  status            balance_status
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+
+  transaction      transactions?      @relation(fields: [transaction_id], references: [id])
+  client_profile   client_profile     @relation(fields: [client_profile_id], references: [id])
+  balance_movement balance_movement[]
+
+  @@index([transaction_id])
+  @@index([client_profile_id])
+}
+
+model balance_movement {
+  id                 Int      @id @default(autoincrement())
+  client_balance_id  Int
+  invoice_payment_id Int
+  amount_used        Float
+  remaining_balance  Float
+  created_at         DateTime @default(now())
+
+  client_balance  client_balance   @relation(fields: [client_balance_id], references: [id])
+  invoice_payment invoice_payments @relation(fields: [invoice_payment_id], references: [id])
+
+  @@index([client_balance_id])
+  @@index([invoice_payment_id])
+}
