@@ -20,7 +20,7 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          VERSION=$(git describe --tags --abbrev=0 || echo "0.1.0")  # Obtiene el último tag o usa 0.1.0
+          VERSION=$(git rev-parse --short HEAD)  # Obtiene el hash corto del commit
           docker build -t ${{ secrets.REGISTRY_URL }}/${{ secrets.IMAGE_ALIAS }}:$VERSION .
           docker tag ${{ secrets.REGISTRY_URL }}/${{ secrets.IMAGE_ALIAS }}:$VERSION ${{ secrets.REGISTRY_URL }}/${{ secrets.IMAGE_ALIAS }}:latest
           docker push ${{ secrets.REGISTRY_URL }}/${{ secrets.IMAGE_ALIAS }}:$VERSION
