@@ -32,7 +32,7 @@ jobs:
           -H "Content-Type: application/json" \
           -H "Authorization: Bearer #5L!o9JRcBuex%KJCK2H" \
           -d '{
-            "service_name: "container-backend",
+            "service_name": "container-backend",
             "image_alias": "netispay-backend",
             "tag": "${{ github.sha }}"
           }'
