@@ -26,16 +26,13 @@ jobs:
           docker push ${{ secrets.REGISTRY_URL }}/${{ secrets.IMAGE_ALIAS }}:$VERSION
           docker push ${{ secrets.REGISTRY_URL }}/${{ secrets.IMAGE_ALIAS }}:latest
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.REGISTRY_URL }}
-          username: ubuntu
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /home/ubuntu
-            ./update-clients.sh \
-              --service-name ${{ secrets.SERVICE_NAME }} \
-              --image-alias ${{ secrets.IMAGE_ALIAS }} \
-              --registry-url ${{ secrets.REGISTRY_URL }} \
-              --tag $VERSION
+      - name: Notify server to deploy
+        run: |
+          curl -X POST https://registry.netispay.com/deploy/github-actions-deploy \
+          -H "Content-Type: application/json" \
+          -H "Authorization: Bearer #5L!o9JRcBuex%KJCK2H" \
+          -d '{
+            "service_name: "container-backend",
+            "image_alias": "netispay-backend",
+            "tag": "${{ github.sha }}"
+          }'
