@@ -30,7 +30,7 @@ jobs:
         run: |
           curl -X POST https://registry.netispay.com/deploy/github-actions-deploy \
           -H "Content-Type: application/json" \
-          -H "Authorization: Bearer #5L!o9JRcBuex%KJCK2H" \
+          -H "Authorization: Bearer unnamable6_dress_virtual_legibly_drone" \
           -d '{
             "service_name": "container-backend",
             "image_alias": "netispay-backend",
