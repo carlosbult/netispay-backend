@@ -28,12 +28,12 @@ jobs:
 
       - name: Notify server to deploy
         run: |
-          VERSION=$(git rev-parse --short HEAD)  # Obtiene el hash corto del commit
+          VERSION=${{ steps.build-image.outputs.VERSION }} # Access the VERSION output
           curl -X POST https://registry.netispay.com/deploy/github-actions-deploy \
-          -H "Content-Type: application/json" \
-          -H "Authorization: Bearer unnamable6_dress_virtual_legibly_drone" \
-          -d '{
-            "service_name": "container-backend",
-            "image_alias": "netispay-backend",
-            "tag": "$VERSION"
-          }'
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer unnamable6_dress_virtual_legibly_drone" \
+            -d '{
+                "service_name": "container-backend",
+                "image_alias": "netispay-backend",
+                "tag": "'"$VERSION"'" # Correct way to embed the variable in JSON
+            }'
