@@ -77,7 +77,7 @@ export class BanescoPayButtonService extends BaseBankProductService {
     }
     try {
       // Mockup para entorno de pruebas
-      if (NODE_ENV === 'dev') {
+      if (NODE_ENV === 'development') {
         return this.mockProcessPayment(data);
       }
 

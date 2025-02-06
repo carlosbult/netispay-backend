@@ -5,7 +5,7 @@ import { UserCreationService } from './user/user-creation.service';
 import { UserQueryService } from './user/user-query.service';
 import { UserManagementService } from './user/user-management.service';
 import { UserInvoicesService } from './invoices/invoices.service';
-import { MailService } from 'src/common/utils/sendMail';
+// import { MailService } from 'src/common/utils/sendMail';
 import { NetworkManagersModule } from 'src/modules/network-managers/network-manager.module';
 import { NetworkManagerFactoryService } from 'src/modules/network-managers/network-manager-factory.service';
 import { BankProductFactoryService } from 'src/modules/bank-connectors/bank-product-factory.service';
@@ -29,7 +29,7 @@ import { SessionModule } from '../auth/session/session.module';
     UserQueryService,
     UserManagementService,
     UserInvoicesService,
-    MailService,
+    // MailService,
     NetworkManagerFactoryService,
     BankProductFactoryService,
     AutomaticBalanceRegistrationService,

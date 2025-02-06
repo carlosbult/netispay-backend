@@ -27,6 +27,7 @@ FROM node:22.12.0-bullseye-slim
 
 # Configurar variables de entorno
 ENV NODE_ENV=production
+ENV PORT=3000
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome
 

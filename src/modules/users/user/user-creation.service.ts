@@ -5,7 +5,7 @@ import { Cache } from 'cache-manager';
 import { PrismaService } from 'prisma/prisma.service';
 import { CustomException } from 'src/common/exceptions/custom-exception';
 import { hashPassword } from 'src/common/utils/hashPassword';
-import { MailService } from 'src/common/utils/sendMail';
+// import { MailService } from 'src/common/utils/sendMail';
 import { ErrorCode } from 'src/interfaces/errorCodes';
 import { NetworkManagerFactoryService } from 'src/modules/network-managers/network-manager-factory.service';
 import { AdministrativeDto } from '../dto/administrative.dto';
@@ -16,7 +16,7 @@ export class UserCreationService {
   constructor(
     private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
-    private readonly mailService: MailService,
+    // private readonly mailService: MailService,
     private readonly networkManagerFactory: NetworkManagerFactoryService,
   ) {}
 
