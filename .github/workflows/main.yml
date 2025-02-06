@@ -33,7 +33,7 @@ jobs:
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.AUTHORIZATION_REGISTRY_TOKEN }}" \
             -d '{
-                "service_name": ${{ secrets.SERVICE_NAME }},
-                "image_alias": ${{ secrets.IMAGE_ALIAS }},
+                "service_name": "'"${{ secrets.SERVICE_NAME }}"'",
+                "image_alias": "'"${{ secrets.IMAGE_ALIAS }}"'",
                 "tag": "'"$VERSION"'"
             }'
