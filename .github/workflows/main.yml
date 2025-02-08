@@ -2,10 +2,13 @@ name: Deploy to Lightsail
 
 on:
   push:
-    branches: [master]
+    branches:
+      - master
+      - qa
 
 jobs:
   build-and-deploy:
+    if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -36,4 +39,40 @@ jobs:
                 "service_name": "'"${{ secrets.SERVICE_NAME }}"'",
                 "image_alias": "'"${{ secrets.IMAGE_ALIAS }}"'",
                 "tag": "'"$VERSION"'"
+            }'
+
+  build-and-deploy-qa:
+    if: github.ref == 'refs/heads/qa'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to Private Docker Registry
+        run: |
+          echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login ${{ secrets.REGISTRY_URL }} -u ${{ secrets.REGISTRY_USER }} --password-stdin
+
+      - name: Build and Push Docker Images for QA
+        run: |
+          VERSION=$(git rev-parse --short HEAD)
+          docker build -t ${{ secrets.REGISTRY_URL }}/${{ secrets.IMAGE_ALIAS }}:$VERSION .
+          docker tag ${{ secrets.REGISTRY_URL }}/${{ secrets.IMAGE_ALIAS }}:$VERSION ${{ secrets.REGISTRY_URL }}/${{ secrets.IMAGE_ALIAS }}:latest
+          docker push ${{ secrets.REGISTRY_URL }}/${{ secrets.IMAGE_ALIAS }}:$VERSION
+          docker push ${{ secrets.REGISTRY_URL }}/${{ secrets.IMAGE_ALIAS }}:latest
+
+      - name: Notify server to deploy
+        run: |
+          VERSION=$(git rev-parse --short HEAD)
+          curl -X POST https://${{ secrets.REGISTRY_URL }}/deploy/github-actions-qa-deploy \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.AUTHORIZATION_REGISTRY_TOKEN }}" \
+            -d '{
+                "service_name": "'"${{ secrets.SERVICE_NAME }}"'",
+                "image_alias": "'"${{ secrets.IMAGE_ALIAS }}"'",
+                "tag": "'"$VERSION"'",
+                "aws_access_key": "'"${{secrets.AWS_QA_ACCESS_KEY}}"'",
+                "aws_secret_key": "'"${{secrets.AWS_QA_SECRET_KEY}}"'"
             }'
