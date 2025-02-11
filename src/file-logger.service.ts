@@ -7,9 +7,7 @@ export class FileLogger implements LoggerService {
 
   constructor() {
     const logDir = path.join(__dirname, '../../../logs');
-    if (!fs.existsSync(logDir)) {
-      fs.mkdirSync(logDir);
-    }
+    fs.mkdirSync(logDir, { recursive: true });
 
     const logFile = path.join(
       logDir,
@@ -44,15 +42,34 @@ export class FileLogger implements LoggerService {
     context?: string,
     trace?: string,
   ) {
-    const timestamp = new Date().toISOString();
-    const log = {
-      timestamp,
-      level,
-      context: context || 'Application',
-      message,
-      ...(trace && { trace }),
-    };
+    try {
+      const timestamp = new Date().toISOString();
+      const log = {
+        timestamp,
+        level,
+        context: context || 'Application',
+        message,
+        ...(trace && { trace }),
+      };
 
-    this.logStream.write(`${JSON.stringify(log)}\n`);
+      if (!this.logStream) {
+        this.logStream = fs.createWriteStream(this.getLogFilePath(), {
+          flags: 'a',
+        });
+      }
+
+      this.logStream.write(`${JSON.stringify(log)}\n`);
+    } catch (error) {
+      console.error(`Error writing to log file: ${error.message}`);
+    }
+  }
+
+  private getLogFilePath(): string {
+    const logDir = path.join(__dirname, '../../../logs');
+    const logFile = path.join(
+      logDir,
+      `${new Date().toISOString().split('T')[0]}.log`,
+    );
+    return logFile;
   }
 }

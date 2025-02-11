@@ -14,6 +14,12 @@ export class ManageBankProductService {
     private encryptionService: EncryptionService,
   ) {}
 
+  // Obetner todos los bancos registrados en la tabla bank
+  async getBanks() {
+    const banks = await this.prisma.banks.findMany();
+    return banks;
+  }
+
   async create(createBankProductDto: CreateBankProductDto) {
     try {
       const { configurations, ...productData } = createBankProductDto;

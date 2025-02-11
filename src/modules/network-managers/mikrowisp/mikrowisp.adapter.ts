@@ -47,14 +47,19 @@ export class MikrowispAdapter {
         await this.initializeClient();
       }
 
+      console.log('data de post mikrowisp: ', data);
+
       const token = data.token || this.defaultToken;
       const response = await this.client.post(endpoint, {
         ...data,
         token,
       });
 
+      console.log('response de post mikrowisp: ', response);
+
       return response.data;
     } catch (error) {
+      // console.log('error de post mikrowisp: ', error);
       if (error instanceof CustomException) {
         throw error;
       }

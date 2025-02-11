@@ -27,13 +27,18 @@ async function bootstrap() {
       fs.mkdirSync(logDir);
     }
 
+    const loggerOptions = {
+      bufferLogs: true, // Almacena logs en buffer hasta que la app esté lista
+    };
+
+    if (process.env.NODE_ENV === 'production') {
+      loggerOptions['logger'] = new FileLogger();
+    }
+
     app = await NestFactory.create<NestFastifyApplication>(
       AppModule,
       new FastifyAdapter(),
-      {
-        logger: new FileLogger(),
-        bufferLogs: true, // Almacena logs en buffer hasta que la app esté lista
-      },
+      loggerOptions,
     );
 
     // Configurar el logger global
@@ -91,9 +96,14 @@ async function bootstrap() {
     SwaggerModule.setup('api/docs', app, document);
 
     await app.listen(PORT, '0.0.0.0');
-    logger.log(`Aplicación iniciada en el puerto ${PORT}`);
+
+    logger.log(
+      `Aplicación iniciada en el puerto ${PORT} | Environment: ${process.env.NODE_ENV}`,
+    );
   } catch (error) {
-    console.error(`Error al iniciar la aplicación: ${error}`);
+    const logger = new FileLogger();
+    console.log('Error al iniciar la aplicacion: ', error);
+    logger.error(`Error durante el bootstrap: ${error.message}`, error.stack);
     process.exit(1);
   }
 }
