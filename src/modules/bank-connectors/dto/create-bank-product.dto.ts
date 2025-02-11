@@ -5,11 +5,7 @@ import {
   IsOptional,
   IsBoolean,
 } from 'class-validator';
-import {
-  bank_products_name,
-  currencies,
-  
-} from '@prisma/client';
+import { bank_products_name, currencies } from '@prisma/client';
 
 export enum payment_category {
   BALANCE = 'BALANCE',
@@ -17,7 +13,7 @@ export enum payment_category {
   DEBIT_CARD = 'DEBIT_CARD',
   PAYMENT_LINK = 'PAYMENT_LINK',
   BANK_TRANSFER = 'BANK_TRANSFER',
-  CRYPTO = 'CRYPTO'
+  CRYPTO = 'CRYPTO',
 }
 
 export class CreateBankProductDto {

@@ -86,4 +86,14 @@ export class BankProductController {
   ) {
     return this.bankProductService.update(+id, updateBankProductDto);
   }
+
+  @Get('banks')
+  @ApiOperation({ summary: 'Obtener lista de bancos' })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de bancos obtenida exitosamente',
+  })
+  getBanks() {
+    return this.bankProductService.getBanks();
+  }
 }

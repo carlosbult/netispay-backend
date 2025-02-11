@@ -1,4 +1,4 @@
-import { bank_products_name, currencies } from '@prisma/client';
+import { bank_products_name, currencies, payment_category } from '@prisma/client';
 
 export interface BankProductConfiguration {
   readonly bank_commission_rate: number;
@@ -11,6 +11,7 @@ export interface BankProduct {
   readonly api_url: string;
   readonly api_key: string;
   readonly api_secret: string;
+  readonly payment_category: payment_category;
   readonly configurations: {
     readonly create: BankProductConfiguration;
   };

@@ -12,6 +12,7 @@ import { BankProductFactoryService } from 'src/modules/bank-connectors/bank-prod
 import { BancaribeModule } from '../bank-connectors/bancaribe/bancaribe.module';
 import { BanescoModule } from '../bank-connectors/banesco/banesco.module';
 import { BinanceModule } from '../bank-connectors/binance/binance.module';
+import { BancoPlazaModule } from '../bank-connectors/banco-plaza/banco-plaza.module';
 import { AutomaticBalanceRegistrationService } from './invoices/automatic-balance-registration.service';
 import { SessionModule } from '../auth/session/session.module';
 
@@ -21,6 +22,7 @@ import { SessionModule } from '../auth/session/session.module';
     BancaribeModule,
     BanescoModule,
     BinanceModule,
+    BancoPlazaModule,
     SessionModule,
   ],
   controllers: [UsersController, InvoicesController],

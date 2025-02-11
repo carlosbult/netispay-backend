@@ -26,51 +26,66 @@ export abstract class BaseBankProductService implements BankProduct {
     productName: bank_products_name,
     bankCode: string,
   ) {
-    const [bankProduct, currentDolarRate] = await Promise.all([
-      this.prisma.bank_product.findFirst({
-        where: {
-          name: productName,
-          banks: {
-            code: bankCode,
+    try {
+      const [bankProduct, currentDolarRate] = await Promise.all([
+        this.prisma.bank_product.findFirst({
+          where: {
+            name: productName,
+            banks: {
+              code: bankCode,
+            },
+            is_active: true,
           },
-          is_active: true,
-        },
-        include: {
-          banks: true,
-          configurations: true,
-        },
-      }),
+          include: {
+            banks: true,
+            configurations: true,
+          },
+        }),
 
-      this.prisma.dolar_rate.findFirst({
-        orderBy: { created_at: 'desc' },
-      }),
-    ]);
+        this.prisma.dolar_rate.findFirst({
+          orderBy: { created_at: 'desc' },
+        }),
+      ]);
 
-    if (!bankProduct) {
+      if (!bankProduct) {
+        throw new CustomException({
+          message: 'Bank product configuration not found',
+          statusCode: HttpStatus.NOT_FOUND,
+          errorCode: ErrorCode.NOT_FOUND,
+        });
+      }
+
+      if (!currentDolarRate) {
+        throw new CustomException({
+          message: 'Dolar rate not found',
+          statusCode: HttpStatus.NOT_FOUND,
+          errorCode: ErrorCode.NOT_FOUND,
+        });
+      }
+
+      this.bankProductConfig = {
+        id: bankProduct.id,
+        bank_name: bankProduct.banks.name,
+        api_url: this.encryptionService.decrypt(bankProduct.api_url),
+        api_key: this.encryptionService.decrypt(bankProduct.api_key),
+        api_secret: this.encryptionService.decrypt(bankProduct.api_secret),
+        bank_commission_rate:
+          bankProduct.configurations[0].bank_commission_rate,
+        currentDolarRateId: currentDolarRate.id,
+      };
+    } catch (error) {
+      console.error('Error getting bank product config', error);
+
+      if (error instanceof CustomException) {
+        throw error;
+      }
+
       throw new CustomException({
-        message: 'Bank product configuration not found',
-        statusCode: HttpStatus.NOT_FOUND,
-        errorCode: ErrorCode.NOT_FOUND,
+        message: 'Error getting bank product config',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        errorCode: ErrorCode.INTERNAL_SERVER_ERROR,
       });
     }
-
-    if (!currentDolarRate) {
-      throw new CustomException({
-        message: 'Dolar rate not found',
-        statusCode: HttpStatus.NOT_FOUND,
-        errorCode: ErrorCode.NOT_FOUND,
-      });
-    }
-
-    this.bankProductConfig = {
-      id: bankProduct.id,
-      bank_name: bankProduct.banks.name,
-      api_url: this.encryptionService.decrypt(bankProduct.api_url),
-      api_key: this.encryptionService.decrypt(bankProduct.api_key),
-      api_secret: this.encryptionService.decrypt(bankProduct.api_secret),
-      bank_commission_rate: bankProduct.configurations[0].bank_commission_rate,
-      currentDolarRateId: currentDolarRate.id,
-    };
   }
 
   protected async createTransactionRecord(data: {
@@ -83,29 +98,38 @@ export abstract class BaseBankProductService implements BankProduct {
     errorMessage?: string;
     bankResponse: any;
   }) {
-    return await this.prisma.transactions.create({
-      data: {
-        bank_product: {
-          connect: {
-            id: this.bankProductConfig.id,
+    try {
+      return await this.prisma.transactions.create({
+        data: {
+          bank_product: {
+            connect: {
+              id: this.bankProductConfig.id,
+            },
           },
-        },
-        dolar_rate: {
-          connect: {
-            id: this.bankProductConfig.currentDolarRateId,
+          dolar_rate: {
+            connect: {
+              id: this.bankProductConfig.currentDolarRateId,
+            },
           },
+          bank_reference: data.bankReference,
+          intermediate_id: data.intermediateId,
+          amount: data.amount,
+          currency: data.currency,
+          payment_status: data.status,
+          error_code: data.errorCode,
+          error_message: data.errorMessage,
+          bank_response: data.bankResponse,
+          month_year: new Date().toISOString().slice(0, 7),
         },
-        bank_reference: data.bankReference,
-        intermediate_id: data.intermediateId,
-        amount: data.amount,
-        currency: data.currency,
-        payment_status: data.status,
-        error_code: data.errorCode,
-        error_message: data.errorMessage,
-        bank_response: data.bankResponse,
-        month_year: new Date().toISOString().slice(0, 7),
-      },
-    });
+      });
+    } catch (error) {
+      console.error('Error creating transaction record', error);
+      throw new CustomException({
+        message: 'Error creating transaction record',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        errorCode: ErrorCode.INTERNAL_SERVER_ERROR,
+      });
+    }
   }
 
   protected createPaymentResponse(data: {
@@ -120,33 +144,51 @@ export abstract class BaseBankProductService implements BankProduct {
     bankCode?: string;
     bankProduct: bank_products_name;
   }): PaymentResponse {
-    return {
-      success: data.success,
-      transactionId: data.transaction.id,
-      bankReference: data.bankReference,
-      amount: data.amount,
-      currency: data.currency,
-      status: data.status,
-      errorCode: data.errorCode,
-      errorMessage: data.errorMessage,
-      paymentMethod: `${this.bankProductConfig.bank_name} - ${data.bankProduct}`,
-      bankCode: data.bankCode,
-    };
+    try {
+      return {
+        success: data.success,
+        transactionId: data.transaction.id,
+        bankReference: data.bankReference,
+        amount: data.amount,
+        currency: data.currency,
+        status: data.status,
+        errorCode: data.errorCode,
+        errorMessage: data.errorMessage,
+        paymentMethod: `${this.bankProductConfig.bank_name} - ${data.bankProduct}`,
+        bankCode: data.bankCode,
+      };
+    } catch (error) {
+      console.error('Error creating payment response', error);
+      throw new CustomException({
+        message: 'Error creating payment response',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        errorCode: ErrorCode.INTERNAL_SERVER_ERROR,
+      });
+    }
   }
 
   protected handleDuplicateTransaction(transaction: any): PaymentResponse {
-    return {
-      success: false,
-      transactionId: transaction.id,
-      bankReference: transaction.bank_reference,
-      amount: transaction.amount,
-      currency: transaction.currency,
-      status: transaction.payment_status,
-      errorCode: ErrorCode.DUPLICATE_TRANSACTION,
-      errorMessage: `La transacción ya fue procesada previamente`,
-      paymentMethod: `${this.bankProductConfig.bank_name} - ${transaction.bank_product.name}`,
-      isDuplicate: true,
-    };
+    try {
+      return {
+        success: false,
+        transactionId: transaction.id,
+        bankReference: transaction.bank_reference,
+        amount: transaction.amount,
+        currency: transaction.currency,
+        status: transaction.payment_status,
+        errorCode: ErrorCode.DUPLICATE_TRANSACTION,
+        errorMessage: `La transacción ya fue procesada previamente`,
+        paymentMethod: `${this.bankProductConfig.bank_name} - ${transaction.bank_product.name}`,
+        isDuplicate: true,
+      };
+    } catch (error) {
+      console.error('Error handling duplicate transaction', error);
+      throw new CustomException({
+        message: 'Error handling duplicate transaction',
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        errorCode: ErrorCode.INTERNAL_SERVER_ERROR,
+      });
+    }
   }
 
   abstract processPayment(data: any): Promise<PaymentResponse>;

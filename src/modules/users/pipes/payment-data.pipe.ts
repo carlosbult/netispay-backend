@@ -3,6 +3,7 @@ import { plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { BinanceTransactionDto } from '../../bank-connectors/binance/dto/transaction.dto';
 import { BanescoPayButtonDto } from '../../bank-connectors/banesco/dto/payButton.dto';
+import { BancoPlazaC2PDto } from '../../bank-connectors/banco-plaza/dto/c2p.dto';
 import { bank_products_name } from '@prisma/client';
 import { CustomException } from 'src/common/exceptions/custom-exception';
 import { ErrorCode } from 'src/interfaces/errorCodes';
@@ -16,6 +17,9 @@ export class PaymentDataPipe implements PipeTransform {
       },
       '0134': {
         [bank_products_name.PAY_BUTTON]: BanescoPayButtonDto,
+      },
+      '0138': {
+        [bank_products_name.C2P]: BancoPlazaC2PDto,
       },
     };
 

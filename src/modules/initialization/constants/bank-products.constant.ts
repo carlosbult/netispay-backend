@@ -1,4 +1,4 @@
-import { bank_products_name, currencies } from '@prisma/client';
+import { bank_products_name, currencies, payment_category } from '@prisma/client';
 import { BankProduct } from '../interfaces/bank-product.interface';
 
 interface BankProductsByBank {
@@ -20,6 +20,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
           'fUThrnZlUUfzyHbKNMjO4Y9JQl3SqG14oRhD4P2xUmS0Kl4jT6VbvRwzNEtqjdF6',
         api_secret:
           'uhnyJ7ZQoNrQZQQJSkMWGNcOG2Nwi3Saj0pu76iIIkko4fYZAEmKdulODqVtYDBS',
+        payment_category: payment_category.CRYPTO,
         configurations: {
           create: {
             bank_commission_rate: 0.1,
@@ -33,6 +34,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
         api_url: 'https://api.binance.com/api/v1',
         api_key: 'asdfwerwertwe46543654',
         api_secret: 'asdgq34524563546',
+        payment_category: payment_category.CRYPTO,
         configurations: {
           create: {
             bank_commission_rate: 0.1,
@@ -51,6 +53,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
         api_url: 'https://api.banesco.com/paybutton',
         api_key: 'banesco_test_api_key_123',
         api_secret: 'banesco_test_api_secret_456',
+        payment_category: payment_category.BANK_TRANSFER,
         configurations: {
           create: {
             bank_commission_rate: 3.5,
@@ -64,6 +67,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
         api_url: 'https://api.banesco.com/verification',
         api_key: 'banesco_verification_key',
         api_secret: 'banesco_verification_secret',
+        payment_category: payment_category.BANK_TRANSFER,
         configurations: {
           create: {
             bank_commission_rate: 2.5,
@@ -82,6 +86,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
         api_url: 'https://api.bancaribe.com/paybutton',
         api_key: 'bancaribe',
         api_secret: 'bancaribe_test_api_secret_456',
+        payment_category: payment_category.BANK_TRANSFER,
         configurations: {
           create: {
             bank_commission_rate: 2.2,
@@ -95,6 +100,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
         api_url: 'https://api.bancaribe.com/paybutton',
         api_key: 'adgqe62456345',
         api_secret: 'rgasdg3456we454',
+        payment_category: payment_category.BANK_TRANSFER,
         configurations: {
           create: {
             bank_commission_rate: 2,

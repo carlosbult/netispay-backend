@@ -21,6 +21,6 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false
   },
-  "include": ["src/**/*", "prisma/**/*"],
+  "include": ["src/**/*", "prisma/**/*", "src/modules/bank-connectors/banco-plaza"],
   "typeRoots": ["./node_modules/@types", "./types"]
 }
