@@ -1,4 +1,8 @@
-import { bank_products_name, currencies, payment_category } from '@prisma/client';
+import {
+  bank_products_name,
+  currencies,
+  payment_category,
+} from '@prisma/client';
 import { BankProduct } from '../interfaces/bank-product.interface';
 
 interface BankProductsByBank {
@@ -25,6 +29,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
           create: {
             bank_commission_rate: 0.1,
             currency: currencies.USD,
+            description: 'Verificacion transacciones API Binance',
           },
         },
       },
@@ -39,6 +44,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
           create: {
             bank_commission_rate: 0.1,
             currency: currencies.USD,
+            description: 'Pago transacciones boton de pago Binance',
           },
         },
       },
@@ -58,6 +64,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
           create: {
             bank_commission_rate: 3.5,
             currency: currencies.VES,
+            description: 'Boton de pago Banco Banesco',
           },
         },
       },
@@ -72,6 +79,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
           create: {
             bank_commission_rate: 2.5,
             currency: currencies.VES,
+            description: 'Verificacion transacciones API Banesco',
           },
         },
       },
@@ -91,6 +99,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
           create: {
             bank_commission_rate: 2.2,
             currency: currencies.VES,
+            description: 'Boton de pago Banco Caribe',
           },
         },
       },
@@ -105,6 +114,49 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
           create: {
             bank_commission_rate: 2,
             currency: currencies.VES,
+            description: 'Pago transacciones boton de pago Banco Caribe',
+          },
+        },
+      },
+    ],
+  },
+  '0138': {
+    bankName: 'BANCO PLAZA',
+    products: [
+      {
+        name: bank_products_name.C2P,
+        bank_code: '0138',
+        api_url: 'https://apiqa.bancoplaza.com:8585',
+        api_key: 'dc0367760639428799baf555e7d8d039',
+        api_secret: '635df2f460f44acd9fcb1c3fd14163b6',
+        payment_category: payment_category.BANK_TRANSFER,
+        properties: [
+          {
+            property_key: 'telefonoCobrador',
+            property_value: '4160111111',
+            title: 'Telefono Cobrador',
+            description:
+              'Número de teléfono asociado a servicio Pago Móvil Banco Plaza',
+          },
+          {
+            property_key: 'motivo',
+            property_value: 'Pago servicio de internet Netispay',
+            title: 'Motivo registro de pago',
+            description: null,
+          },
+          {
+            property_key: 'origen',
+            property_value: '12',
+            title: 'Origen de la transacción',
+            description:
+              'Origen o Canal. Código que busca clasificar el origen de la transacción para el banco',
+          },
+        ],
+        configurations: {
+          create: {
+            bank_commission_rate: 0,
+            currency: currencies.VES,
+            description: 'Boton de pago Banco Plaza',
           },
         },
       },

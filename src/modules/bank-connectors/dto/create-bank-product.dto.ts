@@ -50,4 +50,12 @@ export class CreateBankProductDto {
     bank_operation_rate?: number;
     currency: currencies;
   }[];
+
+  @IsOptional()
+  properties?: {
+    property_key: string;
+    property_value: string;
+    title: string;
+    description?: string;
+  }[];
 }

@@ -95,8 +95,17 @@ export class BankProductInitializationService {
           api_url: this.encryptionService.encrypt(product.api_url),
           api_key: this.encryptionService.encrypt(product.api_key),
           api_secret: this.encryptionService.encrypt(product.api_secret),
+          payment_category: product.payment_category,
           is_active: true,
           configurations: product.configurations,
+          bank_product_specific_config: {
+            create: product.properties.map((property) => ({
+              property_key: property.property_key,
+              property_value: property.property_value,
+              title: property.title,
+              description: property.description,
+            })),
+          },
         },
       });
 

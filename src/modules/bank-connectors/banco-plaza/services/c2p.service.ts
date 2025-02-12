@@ -64,6 +64,16 @@ export class BancoPlazaC2PService extends BaseBankProductService {
     const paymentData = {
       ...data,
     };
+    const propertiesToMap = ['telefonoCobrador', 'motivo', 'origen'];
+
+    propertiesToMap.forEach((propertyKey) => {
+      const property = this.bankProductConfig.properties.find(
+        (p) => p.property_key === propertyKey,
+      );
+      if (property) {
+        paymentData[propertyKey] = property.property_value;
+      }
+    });
 
     try {
       const result = await this.bancoPlazaAdapter.processPayment(
@@ -80,8 +90,6 @@ export class BancoPlazaC2PService extends BaseBankProductService {
           transactionId,
         });
       }
-
-      console.log('result de processPayment: ', result.data);
 
       return this.handleSuccessfulPayment({
         ...result.data,
