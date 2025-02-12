@@ -7,21 +7,12 @@ import {
   Matches,
   IsOptional,
   Min,
-  IsEnum,
+  // IsEnum,
 } from 'class-validator';
-import { currencies } from '@prisma/client';
-import { TransactionBaseDto } from '../../dto/transactions.dto';
+// import { currencies } from '@prisma/client';
+// import { TransactionBaseDto } from '../../dto/transactions.dto';
 
 export class BancoPlazaC2PDto {
-  @IsString()
-  @Length(10, 10, {
-    message: 'Teléfono debe tener 10 dígitos sin el 0 inicial',
-  })
-  @Matches(/^4(12|14|16|24|26|28)\d{7}$/, {
-    message: 'Formato de teléfono inválido',
-  })
-  telefonoCobrador: string;
-
   @IsString()
   @Length(4, 4, { message: 'Código de banco debe tener 4 dígitos' })
   banco: string;
@@ -48,10 +39,22 @@ export class BancoPlazaC2PDto {
   token: string;
 
   @IsString()
+  @Length(10, 10, {
+    message: 'Teléfono debe tener 10 dígitos sin el 0 inicial',
+  })
+  @Matches(/^4(12|14|16|24|26|28)\d{7}$/, {
+    message: 'Formato de teléfono inválido',
+  })
+  @IsOptional()
+  telefonoCobrador: string;
+
+  @IsString()
   @Length(1, 35, { message: 'Motivo debe tener entre 1-35 caracteres' })
+  @IsOptional()
   motivo: string;
 
   @IsIn(['07', '10', '11', '12'], { message: 'Origen inválido' })
+  @IsOptional()
   origen: string;
 
   // Campos opcionales

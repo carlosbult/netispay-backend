@@ -38,6 +38,7 @@ export abstract class BaseBankProductService implements BankProduct {
           },
           include: {
             banks: true,
+            bank_product_specific_config: true,
             configurations: true,
           },
         }),
@@ -72,6 +73,7 @@ export abstract class BaseBankProductService implements BankProduct {
         bank_commission_rate:
           bankProduct.configurations[0].bank_commission_rate,
         currentDolarRateId: currentDolarRate.id,
+        properties: bankProduct.bank_product_specific_config,
       };
     } catch (error) {
       console.error('Error getting bank product config', error);

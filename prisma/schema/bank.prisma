@@ -6,17 +6,18 @@ model banks {
 }
 
 model bank_product {
-  id               Int                          @id @default(autoincrement())
-  bank_id          Int
-  banks            banks                        @relation(fields: [bank_id], references: [id])
-  name             bank_products_name
-  payment_category payment_category?
-  is_active        Boolean                      @default(false)
-  api_url          String?
-  api_key          String?
-  api_secret       String?
-  transactions     transactions[]
-  configurations   bank_product_configuration[]
+  id                           Int                          @id @default(autoincrement())
+  bank_id                      Int
+  banks                        banks                        @relation(fields: [bank_id], references: [id])
+  name                         bank_products_name
+  payment_category             payment_category?
+  is_active                    Boolean                      @default(false)
+  api_url                      String?
+  api_key                      String?
+  api_secret                   String?
+  transactions                 transactions[]
+  configurations               bank_product_configuration[]
+  bank_product_specific_config bank_product_properties[]
 }
 
 model bank_product_configuration {
@@ -27,6 +28,18 @@ model bank_product_configuration {
   bank_commission_rate Float        @default(0)
   bank_operation_rate  Float?       @default(0)
   currency             currencies
+}
+
+model bank_product_properties {
+  id              Int          @id @default(autoincrement())
+  bank_product_id Int
+  bank_product    bank_product @relation(fields: [bank_product_id], references: [id])
+  property_key    String // Ej: 'telefono_pagador'
+  property_value  String
+  title           String
+  description     String?
+
+  @@unique([bank_product_id, property_key])
 }
 
 model dolar_rate {

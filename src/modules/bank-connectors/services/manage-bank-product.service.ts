@@ -5,7 +5,6 @@ import { UpdateBankProductDto } from '../dto/update-bank-product.dto';
 import { EncryptionService } from 'src/modules/encryption/encryption.service';
 import { CustomException } from 'src/common/exceptions/custom-exception';
 import { ErrorCode } from 'src/interfaces/errorCodes';
-import { payment_category } from '../dto/create-bank-product.dto';
 
 @Injectable()
 export class ManageBankProductService {
@@ -20,9 +19,11 @@ export class ManageBankProductService {
     return banks;
   }
 
+  // Crear un nuevo producto bancario
   async create(createBankProductDto: CreateBankProductDto) {
     try {
-      const { configurations, ...productData } = createBankProductDto;
+      const { configurations, properties, ...productData } =
+        createBankProductDto;
 
       const encryptedApiUrl = this.encryptionService.encrypt(
         productData.api_url,
@@ -47,16 +48,20 @@ export class ManageBankProductService {
           configurations: {
             create: configurations,
           },
+          bank_product_specific_config: {
+            create: properties,
+          },
         },
         include: {
           configurations: true,
+          bank_product_specific_config: true,
           banks: true,
         },
       });
 
       return {
         success: true,
-        message: 'Product created successfully',
+        message: 'Nuevo producto bancario creado exitosamente',
         product: createdProduct,
       };
     } catch (error) {
@@ -73,9 +78,11 @@ export class ManageBankProductService {
     }
   }
 
+  // Actualizar un producto bancario
   async update(id: number, updateBankProductDto: UpdateBankProductDto) {
     try {
-      const { configurations, ...productData } = updateBankProductDto;
+      const { configurations, properties, ...productData } =
+        updateBankProductDto;
 
       if (configurations) {
         // Obtener configuraciones existentes
@@ -98,6 +105,33 @@ export class ManageBankProductService {
             await this.prisma.bank_product_configuration.create({
               data: {
                 ...config,
+                bank_product_id: id,
+              },
+            });
+          }
+        }
+      }
+
+      if (properties) {
+        const existingProperties =
+          await this.prisma.bank_product_properties.findMany({
+            where: { bank_product_id: id },
+          });
+
+        for (const property of properties) {
+          const existingProperty = existingProperties.find(
+            (ep) => ep.property_key === property.property_key,
+          );
+
+          if (existingProperty) {
+            await this.prisma.bank_product_properties.update({
+              where: { id: existingProperty.id },
+              data: property,
+            });
+          } else {
+            await this.prisma.bank_product_properties.create({
+              data: {
+                ...property,
                 bank_product_id: id,
               },
             });
@@ -137,6 +171,7 @@ export class ManageBankProductService {
         data: updateObject,
         include: {
           configurations: true,
+          bank_product_specific_config: true,
           banks: true,
         },
       });
@@ -146,7 +181,7 @@ export class ManageBankProductService {
 
       return {
         success: true,
-        message: 'Product updated successfully',
+        message: 'Producto bancario actualizado exitosamente',
         updatedProduct: {
           ...updatedProduct,
           api_url: api_url,
@@ -167,6 +202,7 @@ export class ManageBankProductService {
     }
   }
 
+  // Obtener todos los productos bancarios
   async findAll(status?: 'active' | 'inactive' | 'all') {
     const where = status === 'all' ? {} : { is_active: status === 'active' };
 
@@ -181,6 +217,15 @@ export class ManageBankProductService {
           payment_category: true,
           api_url: true,
           api_key: true,
+          bank_product_specific_config: {
+            select: {
+              id: true,
+              property_key: true,
+              property_value: true,
+              title: true,
+              description: true,
+            },
+          },
           configurations: {
             select: {
               id: true,
@@ -235,11 +280,13 @@ export class ManageBankProductService {
     }
   }
 
+  // Obtener un producto bancario por su ID
   async findOne(id: number) {
     try {
       const product = await this.prisma.bank_product.findUnique({
         where: { id },
         include: {
+          bank_product_specific_config: true,
           configurations: true,
           banks: true,
         },

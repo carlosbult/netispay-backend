@@ -14,6 +14,12 @@ export interface BankProductConfig {
   api_secret: string;
   bank_commission_rate: number;
   currentDolarRateId: number;
+  properties: {
+    property_key: string;
+    property_value: string;
+    title: string;
+    description?: string;
+  }[];
 }
 
 export interface PaymentResponse {
