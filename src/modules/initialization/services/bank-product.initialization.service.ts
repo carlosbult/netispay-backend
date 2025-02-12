@@ -99,12 +99,13 @@ export class BankProductInitializationService {
           is_active: true,
           configurations: product.configurations,
           bank_product_specific_config: {
-            create: product.properties.map((property) => ({
-              property_key: property.property_key,
-              property_value: property.property_value,
-              title: property.title,
-              description: property.description,
-            })),
+            create:
+              product.properties?.map((property) => ({
+                property_key: property.property_key,
+                property_value: property.property_value,
+                title: property.title,
+                description: property.description,
+              })) || [],
           },
         },
       });
