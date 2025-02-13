@@ -15,6 +15,7 @@ export interface BankProduct {
   readonly bank_code: string;
   readonly api_url: string;
   readonly api_key: string;
+  readonly label: string;
   readonly api_secret: string;
   readonly payment_category: payment_category;
   readonly configurations: {

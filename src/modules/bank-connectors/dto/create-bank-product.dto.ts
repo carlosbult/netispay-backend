@@ -33,6 +33,10 @@ export class CreateBankProductDto {
 
   @IsString()
   @IsOptional()
+  label?: string;
+
+  @IsString()
+  @IsOptional()
   api_url?: string;
 
   @IsString()
