@@ -11,13 +11,13 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { Roles } from './role.decorator';
 import { GetSession, GetUser } from './session.decorator';
 import { SignInDTO } from './session.dto';
 import { SessionGuard } from './session.guard';
 import { SessionService } from './session.service';
-import { ApiTags } from '@nestjs/swagger';
 
 @Controller('session-sign-in')
 @ApiTags('Session Sign In')
@@ -37,7 +37,7 @@ export class SessionController {
         // secure: process.env.NODE_ENV === 'production',
         // maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         httpOnly: true,
-        sameSite: 'strict',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
         secure: process.env.NODE_ENV === 'production',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         path: '/',
