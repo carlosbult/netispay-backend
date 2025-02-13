@@ -9,6 +9,7 @@ model bank_product {
   id                           Int                          @id @default(autoincrement())
   bank_id                      Int
   banks                        banks                        @relation(fields: [bank_id], references: [id])
+  label                        String?                      @default("")
   name                         bank_products_name
   payment_category             payment_category?
   is_active                    Boolean                      @default(false)
