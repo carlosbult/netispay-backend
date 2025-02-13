@@ -217,6 +217,7 @@ export class ManageBankProductService {
           payment_category: true,
           api_url: true,
           api_key: true,
+          label: true,
           bank_product_specific_config: {
             select: {
               id: true,

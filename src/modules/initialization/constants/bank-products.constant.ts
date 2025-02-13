@@ -18,6 +18,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
     products: [
       {
         name: bank_products_name.VERIFICATION_API,
+        label: 'Verificacion transacciones API Binance',
         bank_code: 'BNB',
         api_url: 'https://api.binance.com/api/v1',
         api_key:
@@ -35,6 +36,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
       },
       {
         name: bank_products_name.PAY_BUTTON,
+        label: 'Pago transacciones boton de pago Binance',
         bank_code: 'BNB',
         api_url: 'https://api.binance.com/api/v1',
         api_key: 'asdfwerwertwe46543654',
@@ -59,6 +61,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
         api_url: 'https://api.banesco.com/paybutton',
         api_key: 'banesco_test_api_key_123',
         api_secret: 'banesco_test_api_secret_456',
+        label: 'Pago transacciones boton de pago Banco Banesco',
         payment_category: payment_category.BANK_TRANSFER,
         configurations: {
           create: {
@@ -74,6 +77,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
         api_url: 'https://api.banesco.com/verification',
         api_key: 'banesco_verification_key',
         api_secret: 'banesco_verification_secret',
+        label: 'Verificacion transacciones API Banco Banesco',
         payment_category: payment_category.BANK_TRANSFER,
         configurations: {
           create: {
@@ -94,6 +98,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
         api_url: 'https://api.bancaribe.com/paybutton',
         api_key: 'bancaribe',
         api_secret: 'bancaribe_test_api_secret_456',
+        label: 'Pago transacciones boton de pago Banco Caribe',
         payment_category: payment_category.BANK_TRANSFER,
         configurations: {
           create: {
@@ -109,6 +114,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
         api_url: 'https://api.bancaribe.com/paybutton',
         api_key: 'adgqe62456345',
         api_secret: 'rgasdg3456we454',
+        label: 'Pago transacciones boton de pago Banco Caribe',
         payment_category: payment_category.BANK_TRANSFER,
         configurations: {
           create: {
@@ -127,6 +133,7 @@ export const BANK_PRODUCTS_BY_BANK: BankProductsByBank = {
         name: bank_products_name.C2P,
         bank_code: '0138',
         api_url: 'https://apiqa.bancoplaza.com:8585',
+        label: 'Pago transacciones boton de pago Banco Plaza',
         api_key: 'dc0367760639428799baf555e7d8d039',
         api_secret: '635df2f460f44acd9fcb1c3fd14163b6',
         payment_category: payment_category.BANK_TRANSFER,
