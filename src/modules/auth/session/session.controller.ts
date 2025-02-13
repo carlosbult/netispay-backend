@@ -47,6 +47,7 @@ export class SessionController {
         message: 'Login successful',
         data: {
           session: result.session,
+          token: result.token,
         },
       };
     } catch (error) {
