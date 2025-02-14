@@ -7,6 +7,7 @@ import { NetworkManagerFactoryService } from 'src/modules/network-managers/netwo
 import { GetInvoicesDto } from '../dto/get-invoices.dto';
 import { BankProductFactoryService } from 'src/modules/bank-connectors/bank-product-factory.service';
 import { AutomaticBalanceRegistrationService } from './automatic-balance-registration.service';
+import { processPayment } from 'src/modules/bank-connectors/interfaces/bank-product.interface';
 
 @Injectable()
 export class UserInvoicesService {
@@ -140,7 +141,7 @@ export class UserInvoicesService {
     expectedAmount: number;
     allowPartialPayment: boolean;
     productType: bank_products_name;
-    paymentData: any;
+    paymentData: processPayment;
     invoices: { id: string; amount: number }[];
     balanceApplied?: number;
   }): Promise<any> {

@@ -3,7 +3,7 @@ import { CustomException } from 'src/common/exceptions/custom-exception';
 import { ErrorCode } from 'src/interfaces/errorCodes';
 import { CustomExceptionFilter } from 'src/common/filters/custom-exception.filter';
 import { BancoPlazaC2PService } from './services/c2p.service';
-import { BancoPlazaC2PDto } from './dto/c2p.dto';
+import { processPayment } from '../interfaces/bank-product.interface';
 
 @Controller('banco-plaza')
 export class BancoPlazaController {
@@ -31,7 +31,7 @@ export class BancoPlazaController {
 
   @Post('/process-payment')
   @UseFilters(new CustomExceptionFilter())
-  async processPayment(@Body() data: BancoPlazaC2PDto) {
+  async processPayment(@Body() data: processPayment) {
     try {
       return await this.c2pService.processPayment(data);
     } catch (error) {

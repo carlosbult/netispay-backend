@@ -3,7 +3,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { BankProductFactory } from '../../interfaces/bank-product-factory.interface';
 import { BankProduct } from '../../interfaces/bank-product.interface';
 import { BancoPlazaC2PService } from './c2p.service';
-import {BancoPlazaAdapter} from '../banco-plaza.adapter'
+import { BancoPlazaAdapter } from '../banco-plaza.adapter';
 import { CustomException } from 'src/common/exceptions/custom-exception';
 import { ErrorCode } from 'src/interfaces/errorCodes';
 import { Cache } from 'cache-manager';
@@ -27,7 +27,7 @@ export class BancoPlazaFactoryService implements BankProductFactory {
             this.prismaService,
             this.encryptionService,
             this.cacheManager,
-	    this.bancoPlazaAdapter
+            this.bancoPlazaAdapter,
           );
         default:
           throw new CustomException({

@@ -2,6 +2,7 @@ import { Injectable, Inject, HttpStatus } from '@nestjs/common';
 import {
   // BankProduct,
   PaymentResponse,
+  processPayment,
 } from '../../interfaces/bank-product.interface';
 import { BancoPlazaC2PDto } from '../dto/c2p.dto';
 import { BaseBankProductService } from '../../services/base-bank-product.service';
@@ -56,24 +57,14 @@ export class BancoPlazaC2PService extends BaseBankProductService {
     }
   }
 
-  async processPayment(data: BancoPlazaC2PDto): Promise<PaymentResponse> {
+  async processPayment(data: processPayment): Promise<PaymentResponse> {
     if (!this.bankProductConfig) {
       await this.getBankProductConfig(bank_products_name.C2P, '0138');
     }
-    const transactionId = generateUniqueId(22);
-    const paymentData = {
-      ...data,
-    };
-    const propertiesToMap = ['telefonoCobrador', 'motivo', 'origen'];
 
-    propertiesToMap.forEach((propertyKey) => {
-      const property = this.bankProductConfig.properties.find(
-        (p) => p.property_key === propertyKey,
-      );
-      if (property) {
-        paymentData[propertyKey] = property.property_value;
-      }
-    });
+    const paymentData = await this.transformPaymentData(data);
+
+    const transactionId = generateUniqueId(22);
 
     try {
       const result = await this.bancoPlazaAdapter.processPayment(
@@ -82,6 +73,7 @@ export class BancoPlazaC2PService extends BaseBankProductService {
         this.bankProductConfig.api_secret,
         this.bankProductConfig.api_url,
       );
+      console.log('result', result);
 
       if (!result.success) {
         return this.handleErrorPayment({
@@ -134,7 +126,6 @@ export class BancoPlazaC2PService extends BaseBankProductService {
 
       return this.createPaymentResponse(paymentData);
     } catch (error) {
-      console.log('error de handleSuccessfulPayment: ', error);
       if (error instanceof CustomException) {
         throw error;
       }
@@ -156,7 +147,7 @@ export class BancoPlazaC2PService extends BaseBankProductService {
         amount: data.monto,
         currency: 'VES',
         status: payment_status.FAILED,
-        errorMessage: data.descripcionSistema,
+        errorMessage: data.descripcionSistema || data.descripcionCliente,
         errorCode: data.codigoBanco,
         bankResponse: data.rawResponse,
       });
@@ -167,11 +158,10 @@ export class BancoPlazaC2PService extends BaseBankProductService {
         amount: data.monto,
         currency: 'VES',
         status: payment_status.FAILED,
-        errorMessage: data.descripcionSistema,
+        errorMessage: data.descripcionSistema || data.descripcionCliente,
         bankProduct: bank_products_name.C2P,
       });
     } catch (error) {
-      console.log('error de handleFailedPayment: ', error);
       if (error instanceof CustomException) {
         throw error;
       }
@@ -183,5 +173,29 @@ export class BancoPlazaC2PService extends BaseBankProductService {
         details: error,
       });
     }
+  }
+
+  async transformPaymentData(data: processPayment): Promise<BancoPlazaC2PDto> {
+    const paymentData = {
+      banco: data.bankCode,
+      id: data.documentId,
+      telefonoPagador: data.phoneNumber,
+      monto: data.amount,
+      token: data.otp,
+
+      telefonoCobrador: this.bankProductConfig.properties.find(
+        (p) => p.property_key === 'telefonoCobrador',
+      )?.property_value,
+      motivo: this.bankProductConfig.properties.find(
+        (p) => p.property_key === 'motivo',
+      )?.property_value,
+      origen: this.bankProductConfig.properties.find(
+        (p) => p.property_key === 'origen',
+      )?.property_value,
+    };
+
+    console.log('paymentData', paymentData);
+
+    return paymentData;
   }
 }

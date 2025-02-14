@@ -12,6 +12,7 @@ import {
   IsOptional,
 } from 'class-validator';
 import { bank_products_name } from '@prisma/client';
+import { processPayment } from 'src/modules/bank-connectors/interfaces/bank-product.interface';
 
 class InvoiceItemDto {
   @ApiProperty({ description: 'ID de la factura' })
@@ -62,7 +63,7 @@ export class PayInvoiceDto {
   @ApiProperty({ description: 'Datos del pago' })
   @IsObject()
   @IsNotEmpty()
-  paymentData: Record<string, any>;
+  paymentData: processPayment;
 
   @ApiProperty({
     description: 'Lista de facturas a pagar',

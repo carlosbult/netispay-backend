@@ -7,6 +7,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
   BankProduct,
   BankProductConfig,
+  processPayment,
   PaymentResponse,
 } from '../interfaces/bank-product.interface';
 import { CustomException } from 'src/common/exceptions/custom-exception';
@@ -193,7 +194,8 @@ export abstract class BaseBankProductService implements BankProduct {
     }
   }
 
-  abstract processPayment(data: any): Promise<PaymentResponse>;
+  abstract processPayment(data: processPayment): Promise<PaymentResponse>;
   abstract handleErrorPayment(data: any): Promise<PaymentResponse>;
   abstract handleSuccessfulPayment(data: any): Promise<PaymentResponse>;
+  abstract transformPaymentData(data: any): Promise<any>;
 }

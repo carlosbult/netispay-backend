@@ -20,7 +20,7 @@ import { CustomExceptionFilter } from 'src/common/filters/custom-exception.filte
 import { CustomException } from 'src/common/exceptions/custom-exception';
 import { ErrorCode } from 'src/interfaces/errorCodes';
 import { PayInvoiceDto } from '../dto/pay-invoice.dto';
-import { PaymentDataPipe } from '../pipes/payment-data.pipe';
+// import { PaymentDataPipe } from '../pipes/payment-data.pipe';
 import { UserInvoicesService } from './invoices.service';
 import { GetInvoicesDto, GetInvoiceByIdDto } from '../dto/get-invoices.dto';
 
@@ -103,7 +103,7 @@ export class InvoicesController {
   @ApiBody({ type: PayInvoiceDto })
   @ApiCreatedResponse({ description: 'Pago registrado exitosamente' })
   @UseFilters(new CustomExceptionFilter())
-  async processPayment(@Body(PaymentDataPipe) data: PayInvoiceDto) {
+  async processPayment(@Body() data: PayInvoiceDto) {
     try {
       return this.userInvoicesService.processPayment(data);
     } catch (error) {

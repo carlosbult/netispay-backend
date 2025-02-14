@@ -1,9 +1,25 @@
 import { currencies, payment_status } from '@prisma/client';
 
 export interface BankProduct {
-  processPayment?(data: any): Promise<PaymentResponse>;
+  processPayment?(data: processPayment): Promise<PaymentResponse>;
   refundPayment?(data: any): Promise<any>;
   transferFunds?(data: any): Promise<any>;
+}
+
+export interface processPayment {
+  // Datos fijos
+  amount: number;
+  currency: currencies;
+  exchangeRate: number;
+  // Datos variables
+  bankCode?: string;
+  otp?: string;
+  transactionDate?: Date;
+  documentId?: string;
+  email?: string;
+  phoneNumber?: string;
+  reference?: string;
+  ipClient?: string;
 }
 
 export interface BankProductConfig {
