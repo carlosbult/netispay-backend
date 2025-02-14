@@ -252,4 +252,10 @@ export class BanescoPayButtonService extends BaseBankProductService {
     };
     return errorMessages[errorCode] || 'Error desconocido';
   }
+
+  async transformPaymentData(
+    data: BanescoPayButtonDto,
+  ): Promise<BanescoPayButtonDto> {
+    return data;
+  }
 }
