@@ -105,8 +105,7 @@ model invoice_payments {
   client_profile   client_profile?    @relation(fields: [client_profile_id], references: [id])
   admin_profile    admin_profile?     @relation(fields: [admin_profile_id], references: [id])
   balance_movement balance_movement[]
-  transactions     transactions?      @relation(fields: [transactionsId], references: [id])
-  transactionsId   Int?
+  transactions     transactions?      @relation(fields: [transaction_id], references: [id])
 
   @@index([invoice_id])
   @@index([client_profile_id])

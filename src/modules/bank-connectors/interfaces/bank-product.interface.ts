@@ -50,4 +50,5 @@ export interface PaymentResponse {
   paymentMethod: string;
   bankCode?: string;
   isDuplicate?: boolean;
+  bankMessage?: string;
 }

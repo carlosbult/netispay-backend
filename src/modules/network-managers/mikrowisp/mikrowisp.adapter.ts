@@ -55,7 +55,10 @@ export class MikrowispAdapter {
         token,
       });
 
-      console.log('response de post mikrowisp: ', response);
+      console.log(
+        'response de post mikrowisp: ',
+        JSON.stringify(response.data, null, 2),
+      );
 
       return response.data;
     } catch (error) {
