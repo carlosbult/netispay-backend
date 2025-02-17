@@ -144,6 +144,7 @@ export abstract class BaseBankProductService implements BankProduct {
     status: payment_status;
     errorCode?: string;
     errorMessage?: string;
+    bankMessage?: string;
     bankCode?: string;
     bankProduct: bank_products_name;
   }): PaymentResponse {
@@ -157,6 +158,7 @@ export abstract class BaseBankProductService implements BankProduct {
         status: data.status,
         errorCode: data.errorCode,
         errorMessage: data.errorMessage,
+        bankMessage: data.bankMessage,
         paymentMethod: `${this.bankProductConfig.bank_name} - ${data.bankProduct}`,
         bankCode: data.bankCode,
       };

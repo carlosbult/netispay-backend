@@ -24,6 +24,7 @@ export class UserInvoicesService {
    * @returns - Facturas del usuario
    */
   async getInvoices(filters: GetInvoicesDto) {
+    console.log('filters de getInvoices: ', filters);
     const { id, status, limit } = filters;
     try {
       const user = await this.prisma.user.findUnique({
@@ -192,11 +193,7 @@ export class UserInvoicesService {
       const paymentResult = await bankProduct.processPayment(paymentData);
 
       if (!paymentResult.success) {
-        throw new CustomException({
-          message: paymentResult.errorMessage,
-          statusCode: HttpStatus.BAD_REQUEST,
-          errorCode: ErrorCode.PAYMENT_PROCESSING_ERROR,
-        });
+        return paymentResult;
       }
 
       const totalReceived = Number(
@@ -451,11 +448,11 @@ export class UserInvoicesService {
               },
             },
             invoice_payments: {
-              select: {
+              include: {
                 client_profile: true,
-                invoice_data: true,
               },
             },
+            client_balance: true,
           },
           orderBy: {
             created_at: 'desc',
