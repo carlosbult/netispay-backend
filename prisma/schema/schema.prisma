@@ -69,3 +69,21 @@ enum payment_category {
   BANK_TRANSFER
   CRYPTO
 }
+
+enum otp_method_type {
+  SMS
+  APP
+  CALL
+  WHATSAPP
+  EMAIL
+  WEB
+}
+
+enum otp_channel {
+  SMS
+  APP
+  CALL
+  WHATSAPP
+  EMAIL
+  WEB
+}
