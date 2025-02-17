@@ -3,6 +3,7 @@ model banks {
   name         String
   code         String         @unique
   bank_product bank_product[]
+  otp_guides   otp_guide[]
 }
 
 model bank_product {
@@ -143,4 +144,19 @@ model balance_movement {
 
   @@index([client_balance_id])
   @@index([invoice_payment_id])
+}
+
+model otp_guide {
+  id             Int             @id @default(autoincrement())
+  bank_id        Int
+  bank           banks           @relation(fields: [bank_id], references: [id])
+  method_type    otp_method_type
+  channel        otp_channel
+  title          String // Ej: "Cómo generar tu clave OTP por SMS"
+  description    String // Descripción corta
+  steps          Json // Pasos detallados en formato estructurado
+  example_image  String? // URL de imagen demostrativa
+  help_contact   String // Ej: "Contactar al 0500-OTPMERCANTIL"
+  effective_date DateTime // Fecha de vigencia de la guía
+  version        String // Versión del instructivo
 }
