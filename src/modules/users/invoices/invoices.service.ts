@@ -192,7 +192,7 @@ export class UserInvoicesService {
       );
       const paymentResult = await bankProduct.processPayment({
         ...paymentData,
-        clientProfileId: user.client_profile.id,
+        clientProfileId: userId,
       });
 
       if (!paymentResult.success) {
