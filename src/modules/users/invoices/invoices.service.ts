@@ -202,6 +202,8 @@ export class UserInvoicesService {
       const totalReceived = Number(
         (paymentResult.amount + (balanceApplied || 0)).toFixed(2),
       );
+      console.log('totalReceived: ', totalReceived);
+      console.log('expectedAmount: ', expectedAmount);
 
       // 3. Si el monto es menor al esperado, registrar el saldo automáticamente
       if (totalReceived < expectedAmount) {
@@ -237,11 +239,17 @@ export class UserInvoicesService {
 
       // 4. Verificar si el saldo aplicado es suficiente
       if (balanceApplied) {
+        const balanceToCalculate =
+          paymentResult.currency === 'USD'
+            ? balanceApplied
+            : balanceApplied / paymentData.exchangeRate;
+
         const balanceVerification =
           await this.automaticBalanceRegistrationService.verifyAvailableBalance(
             user.client_profile.id,
-            balanceApplied,
+            balanceToCalculate,
           );
+        console.log('balanceVerification: ', balanceVerification);
 
         // Aqui deberia poder guardar el valor de la transaccion como balance
 
