@@ -135,7 +135,7 @@ export class AutomaticBalanceRegistrationService {
             data: {
               invoice_id: data.invoiceId,
               transaction_id: balance.transaction_id,
-              client_profile_id: data.clientProfileId,
+              // client_profile_id: data.clientProfileId,
               network_manager: data.networkManager,
               payment_type: payment_type.BALANCE,
               amount: amountToUseFromBalance,

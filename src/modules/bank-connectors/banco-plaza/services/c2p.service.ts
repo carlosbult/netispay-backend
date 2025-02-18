@@ -78,6 +78,7 @@ export class BancoPlazaC2PService extends BaseBankProductService {
         return this.handleErrorPayment({
           ...result.errorData,
           ...paymentData,
+          clientProfileId: data.clientProfileId,
           transactionId,
         });
       }
@@ -85,6 +86,7 @@ export class BancoPlazaC2PService extends BaseBankProductService {
       return this.handleSuccessfulPayment({
         ...result.data,
         ...paymentData,
+        clientProfileId: data.clientProfileId,
         transactionId,
       });
     } catch (error) {
@@ -110,6 +112,7 @@ export class BancoPlazaC2PService extends BaseBankProductService {
         currency: 'VES',
         status: payment_status.SUCCESS,
         bankResponse: data,
+        clientProfileId: data.clientProfileId,
       });
 
       const paymentData = {
@@ -141,8 +144,6 @@ export class BancoPlazaC2PService extends BaseBankProductService {
   // Implementación requerida por la clase abstracta
   async handleErrorPayment(data: any): Promise<PaymentResponse> {
     try {
-      console.log('handleErrorPayment data: ', JSON.stringify(data, null, 2));
-
       const transaction = await this.createTransactionRecord({
         intermediateId: data.transactionId,
         amount: data.monto,
@@ -151,6 +152,7 @@ export class BancoPlazaC2PService extends BaseBankProductService {
         errorMessage: data.descripcionSistema || data.descripcionCliente,
         errorCode: data.codigoBanco,
         bankResponse: data.rawResponse,
+        clientProfileId: data.clientProfileId,
       });
 
       return this.createPaymentResponse({

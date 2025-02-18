@@ -53,23 +53,31 @@ model dolar_rate {
 }
 
 model transactions {
-  id               Int                @id @default(autoincrement())
-  bank_product_id  Int
-  bank_product     bank_product       @relation(fields: [bank_product_id], references: [id])
-  dolar_rate_id    Int
-  dolar_rate       dolar_rate         @relation(fields: [dolar_rate_id], references: [id])
-  bank_reference   String?
-  intermediate_id  String?
-  amount           Float              @map("amount")
-  currency         currencies
-  payment_status   payment_status
-  error_code       String?
-  error_message    String?
-  bank_response    Json
-  month_year       String
-  created_at       DateTime           @default(now())
-  invoice_payments invoice_payments[]
-  client_balance   client_balance[]
+  id                Int                @id @default(autoincrement())
+  bank_product_id   Int
+  bank_product      bank_product       @relation(fields: [bank_product_id], references: [id])
+  dolar_rate_id     Int
+  dolar_rate        dolar_rate         @relation(fields: [dolar_rate_id], references: [id])
+  bank_reference    String?
+  intermediate_id   String?
+  amount            Float              @map("amount")
+  currency          currencies
+  payment_status    payment_status
+  error_code        String?
+  error_message     String?
+  bank_response     Json
+  month_year        String
+  client_profile_id Int?
+  admin_profile_id  Int?
+  created_at        DateTime           @default(now())
+  invoice_payments  invoice_payments[]
+  client_balance    client_balance[]
+
+  client_profile client_profile? @relation(fields: [client_profile_id], references: [id])
+  admin_profile  admin_profile?  @relation(fields: [admin_profile_id], references: [id])
+
+  @@index([client_profile_id])
+  @@index([admin_profile_id])
 }
 
 model commission_tiers {
@@ -92,25 +100,25 @@ model monthly_commission_summary {
 }
 
 model invoice_payments {
-  id                Int          @id @default(autoincrement())
-  invoice_id        String
-  transaction_id    Int
-  network_manager   String
-  payment_type      payment_type
-  amount            Float
-  invoice_data      Json
-  client_profile_id Int?
-  admin_profile_id  Int?
-  created_at        DateTime     @default(now())
+  id              Int          @id @default(autoincrement())
+  invoice_id      String
+  transaction_id  Int
+  network_manager String
+  payment_type    payment_type
+  amount          Float
+  invoice_data    Json
+  // client_profile_id Int?
+  // admin_profile_id  Int?
+  created_at      DateTime     @default(now())
 
-  client_profile   client_profile?    @relation(fields: [client_profile_id], references: [id])
-  admin_profile    admin_profile?     @relation(fields: [admin_profile_id], references: [id])
+  // client_profile   client_profile?    @relation(fields: [client_profile_id], references: [id])
+  // admin_profile    admin_profile?     @relation(fields: [admin_profile_id], references: [id])
   balance_movement balance_movement[]
   transactions     transactions?      @relation(fields: [transaction_id], references: [id])
+  // @@index([client_profile_id])
+  // @@index([admin_profile_id])
 
   @@index([invoice_id])
-  @@index([client_profile_id])
-  @@index([admin_profile_id])
 }
 
 model client_balance {

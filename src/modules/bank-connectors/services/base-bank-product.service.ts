@@ -100,7 +100,9 @@ export abstract class BaseBankProductService implements BankProduct {
     errorCode?: string;
     errorMessage?: string;
     bankResponse: any;
+    clientProfileId?: number;
   }) {
+    console.log('createTransactionRecord data', data);
     try {
       return await this.prisma.transactions.create({
         data: {
@@ -123,6 +125,18 @@ export abstract class BaseBankProductService implements BankProduct {
           error_message: data.errorMessage,
           bank_response: data.bankResponse,
           month_year: new Date().toISOString().slice(0, 7),
+          // admin_profile: {
+          //   connect: {
+          //     id: data.adminId,
+          //   },
+          // },
+          client_profile: data.clientProfileId
+            ? {
+                connect: {
+                  user_id: data.clientProfileId, // Cambiar 'id' por 'user_id'
+                },
+              }
+            : undefined,
         },
       });
     } catch (error) {

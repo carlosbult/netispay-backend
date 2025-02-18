@@ -86,7 +86,11 @@ export class BinanceTransactionService extends BaseBankProductService {
         return this.handleErrorPayment({
           errorMessage:
             binanceResponse?.message || 'Error en la respuesta de Binance',
-          transactionData: { ...paymentData, transactionId },
+          transactionData: {
+            ...paymentData,
+            transactionId,
+            clientProfileId: data.clientProfileId,
+          },
         });
       }
 
@@ -94,7 +98,11 @@ export class BinanceTransactionService extends BaseBankProductService {
         return this.handleErrorPayment({
           errorMessage:
             'No se encontraron transacciones en el período especificado',
-          transactionData: { ...paymentData, transactionId },
+          transactionData: {
+            ...paymentData,
+            transactionId,
+            clientProfileId: data.clientProfileId,
+          },
         });
       }
 
@@ -106,12 +114,20 @@ export class BinanceTransactionService extends BaseBankProductService {
       if (!verifiedTransaction) {
         return this.handleErrorPayment({
           errorMessage: `No se encontró la transacción especificada con el orderId: ${paymentData.orderId}`,
-          transactionData: { ...paymentData, transactionId },
+          transactionData: {
+            ...paymentData,
+            transactionId,
+            clientProfileId: data.clientProfileId,
+          },
         });
       }
 
       return this.handleSuccessfulPayment({
-        transactionData: { ...verifiedTransaction, transactionId },
+        transactionData: {
+          ...verifiedTransaction,
+          transactionId,
+          clientProfileId: data.clientProfileId,
+        },
         orderId: paymentData.orderId,
       });
     } catch (error) {
@@ -142,6 +158,7 @@ export class BinanceTransactionService extends BaseBankProductService {
         status: payment_status.FAILED,
         errorMessage: data.errorMessage,
         bankResponse: data.transactionData,
+        clientProfileId: data.transactionData.clientProfileId,
       });
 
       return this.createPaymentResponse({
@@ -180,6 +197,7 @@ export class BinanceTransactionService extends BaseBankProductService {
         currency: currencies.USD,
         status: payment_status.SUCCESS,
         bankResponse: data.transactionData,
+        clientProfileId: data.transactionData.clientProfileId,
       });
 
       return this.createPaymentResponse({
