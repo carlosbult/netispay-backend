@@ -1,11 +1,21 @@
-import { Controller, Post, Body, HttpStatus, UseFilters } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  HttpStatus,
+  UseFilters,
+  UseGuards,
+} from '@nestjs/common';
 import { CustomException } from 'src/common/exceptions/custom-exception';
 import { ErrorCode } from 'src/interfaces/errorCodes';
 import { CustomExceptionFilter } from 'src/common/filters/custom-exception.filter';
 import { BancoPlazaC2PService } from './services/c2p.service';
 import { processPayment } from '../interfaces/bank-product.interface';
+import { GetSession } from 'src/modules/auth/session/session.decorator';
+import { SessionGuard } from 'src/modules/auth/session/session.guard';
 
 @Controller('banco-plaza')
+@UseGuards(SessionGuard)
 export class BancoPlazaController {
   constructor(private readonly c2pService: BancoPlazaC2PService) {}
 
@@ -31,9 +41,12 @@ export class BancoPlazaController {
 
   @Post('/process-payment')
   @UseFilters(new CustomExceptionFilter())
-  async processPayment(@Body() data: processPayment) {
+  async processPayment(@Body() data: processPayment, @GetSession() session) {
     try {
-      return await this.c2pService.processPayment(data);
+      return await this.c2pService.processPayment({
+        ...data,
+        clientProfileId: session.userId,
+      });
     } catch (error) {
       if (error instanceof CustomException) {
         throw error;

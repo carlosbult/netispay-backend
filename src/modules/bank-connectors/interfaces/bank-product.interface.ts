@@ -20,6 +20,7 @@ export interface processPayment {
   phoneNumber?: string;
   reference?: string;
   ipClient?: string;
+  clientProfileId?: number;
 }
 
 export interface BankProductConfig {

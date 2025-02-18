@@ -190,7 +190,10 @@ export class UserInvoicesService {
         bankCode,
         productType,
       );
-      const paymentResult = await bankProduct.processPayment(paymentData);
+      const paymentResult = await bankProduct.processPayment({
+        ...paymentData,
+        clientProfileId: user.client_profile.id,
+      });
 
       if (!paymentResult.success) {
         return paymentResult;
@@ -289,7 +292,7 @@ export class UserInvoicesService {
             data: {
               transaction_id: paymentResult.transactionId,
               invoice_id: invoice.id,
-              client_profile_id: user.client_profile.id,
+              // client_profile_id: user.client_profile.id,
               payment_type: payment_type.BANK_TRANSACTION,
               amount: paymentResult.amount,
               network_manager: user.client_profile.isp.network_manager.name,
@@ -336,19 +339,7 @@ export class UserInvoicesService {
       const transaction = await this.prisma.transactions.findUnique({
         where: { id: parseInt(transactionId) },
         include: {
-          invoice_payments: {
-            include: {
-              client_profile: {
-                include: {
-                  isp: {
-                    include: {
-                      network_manager: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
+          invoice_payments: true,
         },
       });
 
@@ -447,12 +438,10 @@ export class UserInvoicesService {
                 },
               },
             },
-            invoice_payments: {
-              include: {
-                client_profile: true,
-              },
-            },
+            invoice_payments: true,
             client_balance: true,
+            client_profile: true,
+            admin_profile: true,
           },
           orderBy: {
             created_at: 'desc',

@@ -30,8 +30,9 @@ model admin_profile {
   isp              isp?                  @relation(fields: [isp_id], references: [id])
   name             String?
   phone            String?
-  invoice_payments invoice_payments[]
+    // invoice_payments        invoice_payments[]
   configuration    admin_configuration[]
+  transactions     transactions[]
 }
 
 model admin_configuration {
@@ -54,7 +55,8 @@ model client_profile {
   phone                   String?
   address                 String?
   type_of_person          type_of_person
-  invoice_payments        invoice_payments[]
+  // invoice_payments        invoice_payments[]
+  transactions            transactions[]
   configuration           client_configuration[]
   client_balance          client_balance[]
 }
