@@ -4,8 +4,10 @@ import { UserController } from './user.controller';
 import { MikrowispAdapter } from '../mikrowisp.adapter';
 import { PrismaService } from 'prisma/prisma.service';
 import { EncryptionService } from 'src/modules/encryption/encryption.service';
+import { SessionModule } from 'src/modules/auth/session/session.module';
 
 @Module({
+  imports: [SessionModule],
   controllers: [UserController],
   providers: [
     UserService,
