@@ -448,7 +448,19 @@ export class UserInvoicesService {
             },
             invoice_payments: true,
             client_balance: true,
-            client_profile: true,
+            client_profile: {
+              include: {
+                isp: {
+                  select: {
+                    network_manager: {
+                      select: {
+                        name: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
             admin_profile: true,
           },
           orderBy: {
