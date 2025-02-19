@@ -10,7 +10,7 @@ import {
   HttpStatus,
   UseFilters,
   Put,
-  UseGuards,
+  // UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -29,12 +29,12 @@ import { UserCreationService } from './user-creation.service';
 import { UserQueryService } from './user-query.service';
 import { UserManagementService } from './user-management.service';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { GetSession } from 'src/modules/auth/session/session.decorator';
-import { SessionGuard } from 'src/modules/auth/session/session.guard';
+// import { GetSession } from 'src/modules/auth/session/session.decorator';
+// import { SessionGuard } from 'src/modules/auth/session/session.guard';
 
 @ApiTags('Users')
 @Controller('users')
-@UseGuards(SessionGuard)
+// @UseGuards(SessionGuard)
 export class UsersController {
   constructor(
     private readonly userCreationService: UserCreationService,
@@ -66,10 +66,10 @@ export class UsersController {
   @UseFilters(new CustomExceptionFilter())
   async administrativeRolesCreation(
     @Body() AdministrativeDto: AdministrativeDto,
-    @GetSession() session,
+    // @GetSession() session,
   ) {
-    const userId = session.userId;
-    console.log('userId: ', userId);
+      // const userId = session.userId;
+      // console.log('userId: ', userId);
     return this.userCreationService.adminUserCreate(AdministrativeDto);
   }
 
@@ -81,10 +81,10 @@ export class UsersController {
   @UseFilters(new CustomExceptionFilter())
   async getMyUser(
     @Param('id', ParseIntPipe) id: number,
-    @GetSession() session,
+    // @GetSession() session,
   ) {
-    const userId = session.userId;
-    console.log('userId in getMyUser: ', userId);
+    // const userId = session.userId;
+    // console.log('userId in getMyUser: ', userId);
     try {
       return await this.userQueryService.getUserById(id);
     } catch (error) {
@@ -128,11 +128,11 @@ export class UsersController {
   @UseFilters(new CustomExceptionFilter())
   async softUserDelete(
     @Param('id') id: string,
-    @GetSession() session,
+    // @GetSession() session,
   ): Promise<void> {
     const parsedId = parseInt(id, 10);
-    const userId = session.userId;
-    console.log('userId: ', userId);
+    // const userId = session.userId;
+    // console.log('userId: ', userId);
     return this.userManagementService.softUserDelete(parsedId);
   }
 
@@ -142,12 +142,12 @@ export class UsersController {
   async updateUser(
     @Param('id') id: string,
     @Body() updateData: UpdateUserDto,
-    @GetSession() session,
+    // @GetSession() session,
   ): Promise<{ message: string }> {
     try {
       const parsedId = parseInt(id, 10);
-      const userId = session.userId;
-      console.log('userId: ', userId);
+      // const userId = session.userId;
+      // console.log('userId: ', userId);
       const response = await this.userManagementService.updateUser(
         parsedId,
         updateData,
