@@ -47,7 +47,7 @@ export class BancoPlazaC2PService extends BaseBankProductService {
         this.bankProductConfig.api_url,
       );
     } catch (error) {
-      console.log('error', error);
+      // console.log('error', error);
       throw new CustomException({
         message: 'Error al generar el token',
         statusCode: HttpStatus.BAD_REQUEST,
@@ -198,8 +198,6 @@ export class BancoPlazaC2PService extends BaseBankProductService {
         (p) => p.property_key === 'origen',
       )?.property_value,
     };
-
-    console.log('paymentData', paymentData);
 
     return paymentData;
   }

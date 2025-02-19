@@ -96,7 +96,7 @@ export class SessionService {
         throw new UnauthorizedException('Invalid credentials');
       }
 
-      const token = await this.generateSessionToken();
+      const token = this.generateSessionToken();
       const session = await this.createSession(token, user.id);
       return {
         token: token,
