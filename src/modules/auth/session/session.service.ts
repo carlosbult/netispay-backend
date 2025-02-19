@@ -100,7 +100,7 @@ export class SessionService {
       const session = await this.createSession(token, user.id);
       return {
         token: token,
-        session: session,
+        session: { ...session, userRole: user.role },
       };
       //TO DO managin error
     } catch (error) {
