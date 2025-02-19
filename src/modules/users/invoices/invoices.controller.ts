@@ -25,10 +25,7 @@ import { PayInvoiceDto } from '../dto/pay-invoice.dto';
 import { UserInvoicesService } from './invoices.service';
 import { GetInvoicesDto, GetInvoiceByIdDto } from '../dto/get-invoices.dto';
 import { SessionGuard } from 'src/modules/auth/session/session.guard';
-import {
-  GetSession,
-  GetUser,
-} from 'src/modules/auth/session/session.decorator';
+import { GetSession } from 'src/modules/auth/session/session.decorator';
 
 @ApiTags('Invoices')
 @Controller('invoices')
@@ -43,9 +40,10 @@ export class InvoicesController {
   @ApiResponse({ status: 400, description: 'Error ' })
   @Get('/transactions')
   @UseFilters(new CustomExceptionFilter())
-  getTransactions(@Query() filters: GetInvoicesDto, @GetUser() user) {
+  getTransactions(@Query() filters: GetInvoicesDto, @GetSession() session) {
     try {
-      console.log('user: ', user);
+      const userId = session.userId;
+      console.log('userId: ', userId);
 
       return this.userInvoicesService.getTransactions(filters);
     } catch (error) {

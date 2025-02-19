@@ -4,9 +4,10 @@ import { InvoiceController } from './invoice.controller';
 import { MikrowispAdapter } from '../mikrowisp.adapter';
 import { PrismaService } from 'prisma/prisma.service';
 import { EncryptionService } from 'src/modules/encryption/encryption.service';
-import { SessionModule } from 'src/modules/auth/session/session.module';
+// import { SessionModule } from 'src/modules/auth/session/session.module';
+
 @Module({
-  imports: [SessionModule],
+  // imports: [SessionModule],
   controllers: [InvoiceController],
   providers: [
     InvoiceService,

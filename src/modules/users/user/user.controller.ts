@@ -29,8 +29,8 @@ import { UserCreationService } from './user-creation.service';
 import { UserQueryService } from './user-query.service';
 import { UserManagementService } from './user-management.service';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { SessionGuard } from 'src/modules/auth/session/session.guard';
 import { GetSession } from 'src/modules/auth/session/session.decorator';
+import { SessionGuard } from 'src/modules/auth/session/session.guard';
 
 @ApiTags('Users')
 @Controller('users')
@@ -51,9 +51,7 @@ export class UsersController {
   })
   @ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
   @UseFilters(new CustomExceptionFilter())
-  async userCreate(@Body() UserDto: UserDto, @GetSession() session) {
-    const userId = session.userId;
-    console.log('userId: ', userId);
+  async userCreate(@Body() UserDto: UserDto) {
     return this.userCreationService.clientUserCreate(UserDto);
   }
 
@@ -172,11 +170,11 @@ export class UsersController {
   @UseFilters(new CustomExceptionFilter())
   async hardUserDelete(
     @Param('id') id: string,
-    @GetSession() session,
+    // @GetSession() session,
   ): Promise<void> {
     const parsedId = parseInt(id, 10);
-    const userId = session.userId;
-    console.log('userId: ', userId);
+    // const userId = session.userId;
+    // console.log('userId: ', userId);
     return this.userManagementService.hardUserDelete(parsedId);
   }
 }
