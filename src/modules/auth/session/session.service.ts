@@ -46,7 +46,11 @@ export class SessionService {
         id: sessionId,
       },
       include: {
-        user: true,
+        user: {
+          include: {
+            client_profile: true,
+          },
+        },
       },
     });
     if (result === null) {
