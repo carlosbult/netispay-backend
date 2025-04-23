@@ -130,13 +130,13 @@ export abstract class BaseBankProductService implements BankProduct {
           //     id: data.adminId,
           //   },
           // },
-          client_profile: data.clientProfileId
-            ? {
-                connect: {
-                  user_id: data.clientProfileId, // Cambiar 'id' por 'user_id'
-                },
-              }
-            : undefined,
+          //   client_profile: data.clientProfileId
+          //     ? {
+          //         connect: {
+          //           user_id: data.clientProfileId, // Cambiar 'id' por 'user_id'
+          //         },
+          //       }
+          //     : undefined,
         },
       });
     } catch (error) {
