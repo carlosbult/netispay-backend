@@ -11,7 +11,8 @@ import { BankProductFactoryService } from '../bank-connectors/bank-product-facto
 import { BancaribeModule } from '../bank-connectors/bancaribe/bancaribe.module';
 import { BanescoModule } from '../bank-connectors/banesco/banesco.module';
 import { BinanceModule } from '../bank-connectors/binance/binance.module';
-import { SessionModule } from '../auth/session/session.module';
+import { BancoPlazaModule } from '../bank-connectors/banco-plaza/banco-plaza.module';
+// import { SessionModule } from '../auth/session/session.module';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { SessionModule } from '../auth/session/session.module';
     BancaribeModule,
     BanescoModule,
     BinanceModule,
-    SessionModule,
+    BancoPlazaModule,
+    // SessionModule,
   ],
   providers: [
     MikrowispFactoryService,

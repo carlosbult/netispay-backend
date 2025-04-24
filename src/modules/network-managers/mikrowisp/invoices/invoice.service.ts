@@ -126,6 +126,8 @@ export class InvoiceService {
     try {
       const response = await this.adapter.post('/PaidInvoice', data);
 
+      console.log('response de payInvoice: ', response);
+
       if (response.estado === 'error') {
         if (
           response.mensaje.includes('Nº de transacción') &&

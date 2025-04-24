@@ -8,6 +8,7 @@ export class PaidInvoiceDto extends BaseMikrowispDto {
   idtransaccion?: string;
   fecha?: string;
   parcial?: boolean;
+
   bankCode?: string;
   clientProfileId: number;
   adminProfileId?: number;

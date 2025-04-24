@@ -1,15 +1,23 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  // UseGuards
+} from '@nestjs/common';
 import { InvoiceService } from './invoice.service';
 import { CreateInvoiceDto } from './dto/create-invoice.dto';
 import { GetInvoicesDto } from './dto/get-invoices.dto';
-import { GetInvoiceByIdDto } from '../../dto/getBillsData.dto';
+// import { GetInvoiceByIdDto } from '../../dto/getBillsData.dto';
 import { PaidInvoiceDto } from './dto/paid-invoice.dto';
 import { DeleteInvoiceDto } from './dto/delete-invoice.dto';
 import { DeleteTransactionMkwsp } from './dto/delete-transaction.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+// import { SessionGuard } from 'src/modules/auth/session/session.guard';
+// import { GetSession } from 'src/modules/auth/session/session.decorator';
 
 @ApiTags('MikroWISP Invoices')
 @Controller('mikrowisp/invoice')
+// @UseGuards(SessionGuard)
 export class InvoiceController {
   constructor(private readonly invoiceService: InvoiceService) {}
 
@@ -18,7 +26,12 @@ export class InvoiceController {
   @ApiBody({ type: CreateInvoiceDto })
   @ApiResponse({ status: 201, description: 'Factura creada exitosamente' })
   @ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
-  createInvoice(@Body() createInvoiceDto: CreateInvoiceDto) {
+  createInvoice(
+    @Body() createInvoiceDto: CreateInvoiceDto,
+    // @GetSession() session,
+  ) {
+    // const userId = session.userId;
+    // console.log('userId: ', userId);
     return this.invoiceService.createInvoice(createInvoiceDto);
   }
 
@@ -30,6 +43,8 @@ export class InvoiceController {
     description: 'Lista de facturas obtenida exitosamente',
   })
   getInvoices(@Body() getInvoicesDto: GetInvoicesDto) {
+    // const userId = session.userId;
+    // console.log('userId: ', userId);
     return this.invoiceService.getInvoices(getInvoicesDto);
   }
 
@@ -39,6 +54,8 @@ export class InvoiceController {
   @ApiResponse({ status: 200, description: 'Pago registrado exitosamente' })
   @ApiResponse({ status: 400, description: 'Error al procesar el pago' })
   payInvoice(@Body() paidInvoiceDto: PaidInvoiceDto) {
+    // const userId = session.userId;
+    // console.log('userId: ', userId);
     return this.invoiceService.payInvoice(paidInvoiceDto);
   }
 
@@ -47,7 +64,12 @@ export class InvoiceController {
   @ApiBody({ type: DeleteInvoiceDto })
   @ApiResponse({ status: 200, description: 'Factura eliminada exitosamente' })
   @ApiResponse({ status: 404, description: 'Factura no encontrada' })
-  deleteInvoice(@Body() deleteInvoiceDto: DeleteInvoiceDto) {
+  deleteInvoice(
+    @Body() deleteInvoiceDto: DeleteInvoiceDto,
+    // @GetSession() session,
+  ) {
+    // const userId = session.userId;
+    // console.log('userId: ', userId);
     return this.invoiceService.deleteInvoice(deleteInvoiceDto);
   }
 
@@ -59,7 +81,12 @@ export class InvoiceController {
     description: 'Transacción eliminada exitosamente',
   })
   @ApiResponse({ status: 404, description: 'Transacción no encontrada' })
-  deleteTransaction(@Body() deleteTransactionDto: DeleteTransactionMkwsp) {
+  deleteTransaction(
+    @Body() deleteTransactionDto: DeleteTransactionMkwsp,
+    // @GetSession() session,
+  ) {
+    // const userId = session.userId;
+    // console.log('userId: ', userId);
     return this.invoiceService.deleteTransaction(deleteTransactionDto);
   }
 }

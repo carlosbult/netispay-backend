@@ -6,12 +6,16 @@ import { EncryptionService } from 'src/modules/encryption/encryption.service';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { BaseBankProductService } from '../../services/base-bank-product.service';
-import { PaymentResponse } from '../../interfaces/bank-product.interface';
+import {
+  PaymentResponse,
+  processPayment,
+} from '../../interfaces/bank-product.interface';
 import { CustomException } from 'src/common/exceptions/custom-exception';
 import { ErrorCode } from 'src/interfaces/errorCodes';
 import { bank_products_name, payment_status, currencies } from '@prisma/client';
 import { BinanceTransactionData } from '../interfaces/binance.interface';
 import { formatDateParams } from '../utils/formatDate';
+import { generateUniqueId } from 'src/common/utils/generateUniqueId';
 
 @Injectable()
 export class BinanceTransactionService extends BaseBankProductService {
@@ -38,16 +42,19 @@ export class BinanceTransactionService extends BaseBankProductService {
     }
   }
 
-  async processPayment(data: BinanceTransactionDto): Promise<PaymentResponse> {
+  async processPayment(data: processPayment): Promise<PaymentResponse> {
     try {
       await this.initializeBinanceClient();
+
+      const paymentData = await this.transformPaymentData(data);
+      const transactionId = generateUniqueId(22);
 
       // Verificar si la transacción ya existe
       const existingTransaction = await this.prisma.transactions.findFirst({
         where: {
           AND: [
             {
-              bank_reference: data.orderId,
+              bank_reference: paymentData.orderId,
             },
             {
               bank_product_id: this.bankProductConfig.id,
@@ -68,8 +75,8 @@ export class BinanceTransactionService extends BaseBankProductService {
 
       // Obtener el historial de pagos de Binance
       const requestParams = formatDateParams({
-        startTime: data.startTime,
-        endTime: data.endTime,
+        startTime: paymentData.startTime,
+        endTime: paymentData.endTime,
       });
       const response = await this.client.payHistory(requestParams);
 
@@ -79,7 +86,11 @@ export class BinanceTransactionService extends BaseBankProductService {
         return this.handleErrorPayment({
           errorMessage:
             binanceResponse?.message || 'Error en la respuesta de Binance',
-          transactionData: data,
+          transactionData: {
+            ...paymentData,
+            transactionId,
+            clientProfileId: data.clientProfileId,
+          },
         });
       }
 
@@ -87,27 +98,40 @@ export class BinanceTransactionService extends BaseBankProductService {
         return this.handleErrorPayment({
           errorMessage:
             'No se encontraron transacciones en el período especificado',
-          transactionData: data,
+          transactionData: {
+            ...paymentData,
+            transactionId,
+            clientProfileId: data.clientProfileId,
+          },
         });
       }
 
       const verifiedTransaction = binanceResponse.data.find(
         (transaction: BinanceTransactionData) =>
-          transaction.orderId === data.orderId,
+          transaction.orderId === paymentData.orderId,
       );
 
       if (!verifiedTransaction) {
         return this.handleErrorPayment({
-          errorMessage: `No se encontró la transacción especificada con el orderId: ${data.orderId}`,
-          transactionData: data,
+          errorMessage: `No se encontró la transacción especificada con el orderId: ${paymentData.orderId}`,
+          transactionData: {
+            ...paymentData,
+            transactionId,
+            clientProfileId: data.clientProfileId,
+          },
         });
       }
 
       return this.handleSuccessfulPayment({
-        transactionData: verifiedTransaction,
-        orderId: data.orderId,
+        transactionData: {
+          ...verifiedTransaction,
+          transactionId,
+          clientProfileId: data.clientProfileId,
+        },
+        orderId: paymentData.orderId,
       });
     } catch (error) {
+      console.log('error binance: ', error);
       if (error instanceof CustomException) {
         throw error;
       }
@@ -128,12 +152,13 @@ export class BinanceTransactionService extends BaseBankProductService {
   }): Promise<PaymentResponse> {
     try {
       const transaction = await this.createTransactionRecord({
-        intermediateId: data.transactionData.orderId,
+        intermediateId: data.transactionData.transactionId,
         amount: parseFloat(data.transactionData.amount || '0'),
         currency: currencies.USD,
         status: payment_status.FAILED,
         errorMessage: data.errorMessage,
         bankResponse: data.transactionData,
+        clientProfileId: data.transactionData.clientProfileId,
       });
 
       return this.createPaymentResponse({
@@ -167,11 +192,12 @@ export class BinanceTransactionService extends BaseBankProductService {
     try {
       const transaction = await this.createTransactionRecord({
         bankReference: data.orderId,
-        intermediateId: data.orderId,
+        intermediateId: data.transactionData.transactionId,
         amount: parseFloat(data.transactionData.amount),
         currency: currencies.USD,
         status: payment_status.SUCCESS,
         bankResponse: data.transactionData,
+        clientProfileId: data.transactionData.clientProfileId,
       });
 
       return this.createPaymentResponse({
@@ -195,5 +221,26 @@ export class BinanceTransactionService extends BaseBankProductService {
         details: error,
       });
     }
+  }
+
+  async transformPaymentData(
+    data: processPayment,
+  ): Promise<BinanceTransactionDto> {
+    // Verificar si data.transactionDate es una instancia de Date
+    if (!(data.transactionDate instanceof Date)) {
+      // Si no es una instancia de Date, intentar parsear la fecha
+      data.transactionDate = new Date(data.transactionDate);
+    }
+
+    const paymentData = {
+      orderId: data.reference,
+      startTime: data.transactionDate.toISOString(),
+      endTime: data.transactionDate.toISOString(),
+      amount: data.amount,
+      currency: data.currency,
+      exchangeRate: data.exchangeRate,
+    };
+
+    return paymentData;
   }
 }

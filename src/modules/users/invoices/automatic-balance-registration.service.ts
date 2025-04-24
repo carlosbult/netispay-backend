@@ -13,6 +13,10 @@ import {
 export class AutomaticBalanceRegistrationService {
   constructor(private prisma: PrismaService) {}
 
+  private roundToTwoDecimals(amount: number): number {
+    return Number(Math.round(Number(amount + 'e2')) + 'e-2');
+  }
+
   /** registerAutomaticBalance
    * Registra un saldo automático
    * @param data - Datos del saldo automático
@@ -29,8 +33,13 @@ export class AutomaticBalanceRegistrationService {
     } = data;
 
     try {
+      const roundedReceivedAmountUsd =
+        this.roundToTwoDecimals(receivedAmountUsd);
+      const roundedExpectedAmountUsd =
+        this.roundToTwoDecimals(expectedAmountUsd);
+
       // Verificar si el monto recibido es menor al esperado
-      if (receivedAmountUsd >= expectedAmountUsd) {
+      if (roundedReceivedAmountUsd >= roundedExpectedAmountUsd) {
         return {
           isRegistered: false,
           remainingAmountUsd: 0,
@@ -39,8 +48,8 @@ export class AutomaticBalanceRegistrationService {
       }
 
       // Calcular el monto restante en USD
-      const remainingAmountUsd = Number(
-        (expectedAmountUsd - receivedAmountUsd).toFixed(2),
+      const remainingAmountUsd = this.roundToTwoDecimals(
+        roundedExpectedAmountUsd - roundedReceivedAmountUsd,
       );
 
       // Registrar el saldo a favor
@@ -48,8 +57,8 @@ export class AutomaticBalanceRegistrationService {
         data: {
           transaction_id: transactionId,
           client_profile_id: clientProfileId,
-          initial_amount: receivedAmountUsd,
-          current_amount: receivedAmountUsd,
+          initial_amount: roundedReceivedAmountUsd,
+          current_amount: roundedReceivedAmountUsd,
           status: balance_status.AVAILABLE,
         },
       });
@@ -93,7 +102,7 @@ export class AutomaticBalanceRegistrationService {
     }>;
   }> {
     try {
-      let remainingAmountToApply = data.balanceApplied;
+      let remainingAmountToApply = this.roundToTwoDecimals(data.balanceApplied);
       const balancePayments = [];
 
       // Obtener todos los saldos activos ordenados por fecha de creación
@@ -135,7 +144,7 @@ export class AutomaticBalanceRegistrationService {
             data: {
               invoice_id: data.invoiceId,
               transaction_id: balance.transaction_id,
-              client_profile_id: data.clientProfileId,
+              // client_profile_id: data.clientProfileId,
               network_manager: data.networkManager,
               payment_type: payment_type.BALANCE,
               amount: amountToUseFromBalance,

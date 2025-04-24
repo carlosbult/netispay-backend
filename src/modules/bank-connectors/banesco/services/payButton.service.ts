@@ -178,6 +178,7 @@ export class BanescoPayButtonService extends BaseBankProductService {
         errorCode,
         errorMessage,
         bankResponse: banescoResponse,
+        clientProfileId: banescoResponse.clientProfileId,
       });
 
       return this.createPaymentResponse({
@@ -216,6 +217,7 @@ export class BanescoPayButtonService extends BaseBankProductService {
         currency: currencies.VES,
         status: payment_status.SUCCESS,
         bankResponse: banescoResponse,
+        clientProfileId: banescoResponse.clientProfileId,
       });
 
       return this.createPaymentResponse({
@@ -251,5 +253,11 @@ export class BanescoPayButtonService extends BaseBankProductService {
       '6': 'Error de plataforma',
     };
     return errorMessages[errorCode] || 'Error desconocido';
+  }
+
+  async transformPaymentData(
+    data: BanescoPayButtonDto,
+  ): Promise<BanescoPayButtonDto> {
+    return data;
   }
 }

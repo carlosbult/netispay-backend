@@ -8,6 +8,7 @@ import {
   UseFilters,
   Delete,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -20,12 +21,15 @@ import { CustomExceptionFilter } from 'src/common/filters/custom-exception.filte
 import { CustomException } from 'src/common/exceptions/custom-exception';
 import { ErrorCode } from 'src/interfaces/errorCodes';
 import { PayInvoiceDto } from '../dto/pay-invoice.dto';
-import { PaymentDataPipe } from '../pipes/payment-data.pipe';
+// import { PaymentDataPipe } from '../pipes/payment-data.pipe';
 import { UserInvoicesService } from './invoices.service';
 import { GetInvoicesDto, GetInvoiceByIdDto } from '../dto/get-invoices.dto';
+import { SessionGuard } from 'src/modules/auth/session/session.guard';
+import { GetSession } from 'src/modules/auth/session/session.decorator';
 
 @ApiTags('Invoices')
 @Controller('invoices')
+@UseGuards(SessionGuard)
 export class InvoicesController {
   constructor(private readonly userInvoicesService: UserInvoicesService) {}
 
@@ -36,8 +40,11 @@ export class InvoicesController {
   @ApiResponse({ status: 400, description: 'Error ' })
   @Get('/transactions')
   @UseFilters(new CustomExceptionFilter())
-  getTransactions(@Query() filters: GetInvoicesDto) {
+  getTransactions(@Query() filters: GetInvoicesDto, @GetSession() session) {
     try {
+      const userId = session.userId;
+      console.log('userId: ', userId);
+
       return this.userInvoicesService.getTransactions(filters);
     } catch (error) {
       if (error instanceof CustomException) {
@@ -59,8 +66,10 @@ export class InvoicesController {
   @ApiResponse({ status: 400, description: 'Error ' })
   @Get('/')
   @UseFilters(new CustomExceptionFilter())
-  getInvoices(@Query() filters: GetInvoicesDto) {
+  getInvoices(@Query() filters: GetInvoicesDto, @GetSession() session) {
     try {
+      const userId = session.userId;
+      console.log('userId: ', userId);
       return this.userInvoicesService.getInvoices(filters);
     } catch (error) {
       if (error instanceof CustomException) {
@@ -82,8 +91,13 @@ export class InvoicesController {
   @ApiResponse({ status: 400, description: 'Error ' })
   @Get('/invoiceById')
   @UseFilters(new CustomExceptionFilter())
-  getInvoiceById(@Query('invoiceIds') invoiceIds: string) {
+  getInvoiceById(
+    @Query('invoiceIds') invoiceIds: string,
+    @GetSession() session,
+  ) {
     try {
+      const userId = session.userId;
+      console.log('userId: ', userId);
       const filters = new GetInvoiceByIdDto(invoiceIds);
       return this.userInvoicesService.getInvoiceById(filters);
     } catch (error) {
@@ -103,8 +117,10 @@ export class InvoicesController {
   @ApiBody({ type: PayInvoiceDto })
   @ApiCreatedResponse({ description: 'Pago registrado exitosamente' })
   @UseFilters(new CustomExceptionFilter())
-  async processPayment(@Body(PaymentDataPipe) data: PayInvoiceDto) {
+  async processPayment(@Body() data: PayInvoiceDto, @GetSession() session) {
     try {
+      const userId = session.userId;
+      console.log('userId: ', userId);
       return this.userInvoicesService.processPayment(data);
     } catch (error) {
       if (error instanceof CustomException) {
@@ -128,8 +144,13 @@ export class InvoicesController {
   @ApiResponse({ status: 400, description: 'Error al eliminar la transacción' })
   @ApiResponse({ status: 404, description: 'Transacción no encontrada' })
   @UseFilters(new CustomExceptionFilter())
-  async deleteTransaction(@Param('id') transactionId: string) {
+  async deleteTransaction(
+    @Param('id') transactionId: string,
+    @GetSession() session,
+  ) {
     try {
+      const userId = session.userId;
+      console.log('userId: ', userId);
       return await this.userInvoicesService.deleteTransaction(transactionId);
     } catch (error) {
       if (error instanceof CustomException) {

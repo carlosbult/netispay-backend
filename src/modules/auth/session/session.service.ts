@@ -46,7 +46,11 @@ export class SessionService {
         id: sessionId,
       },
       include: {
-        user: true,
+        user: {
+          include: {
+            client_profile: true,
+          },
+        },
       },
     });
     if (result === null) {
@@ -96,11 +100,11 @@ export class SessionService {
         throw new UnauthorizedException('Invalid credentials');
       }
 
-      const token = await this.generateSessionToken();
+      const token = this.generateSessionToken();
       const session = await this.createSession(token, user.id);
       return {
         token: token,
-        session: session,
+        session: { ...session, userRole: user.role },
       };
       //TO DO managin error
     } catch (error) {

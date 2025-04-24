@@ -50,35 +50,34 @@ export class DolarRateScraper {
         waitUntil: 'networkidle0',
       });
 
-      // Obtener ambas tasas en una sola evaluación
+      // Obtener ambas tasas en una sola evaluación con la nueva estructura HTML
       const rates = await this.page.evaluate(() => {
-        const elements = document.querySelectorAll(
-          '.border-2.rounded-lg.shadow.p-2.text-center.overflow-hidden',
+        const containers = document.querySelectorAll(
+          '.lg\\:col-span-1.md\\:col-span3.sm\\:col-span-3.col-span-6',
         );
+        let bcvRate = null;
+        let parallelRate = null;
 
-        // Convertir NodeList a Array para usar map
-        return Array.from(elements)
-          .map((element) => {
-            const title = element.querySelector('h3')?.textContent || '';
-            const rateText =
-              element.querySelector('p.font-bold.text-xl')?.textContent || '';
-            return { title, rate: rateText };
-          })
-          .reduce(
-            (acc, { title, rate }) => {
-              if (title.includes('@EnParaleloVzla3')) {
-                acc.parallelRate = parseFloat(
-                  rate.replace('Bs = ', '').replace(',', '.'),
-                );
-              } else if (title.includes('BCV (Oficial)')) {
-                acc.bcvRate = parseFloat(
-                  rate.replace('Bs = ', '').replace(',', '.'),
-                );
-              }
-              return acc;
-            },
-            { parallelRate: null, bcvRate: null },
+        containers.forEach((container) => {
+          const titleElement = container.querySelector('h3');
+          const rateElement = container.querySelector('p.font-bold.text-xl');
+
+          if (!titleElement || !rateElement) return;
+
+          const title = titleElement.textContent?.trim() || '';
+          const rateText = rateElement.textContent?.trim() || '';
+          const rate = parseFloat(
+            rateText.replace('Bs = ', '').replace(',', '.'),
           );
+
+          if (title.includes('Dólar BCV (Oficial)')) {
+            bcvRate = rate;
+          } else if (title.includes('Dólar Paralelo')) {
+            parallelRate = rate;
+          }
+        });
+
+        return { bcvRate, parallelRate };
       });
 
       if (

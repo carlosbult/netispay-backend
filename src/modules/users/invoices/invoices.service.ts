@@ -7,6 +7,7 @@ import { NetworkManagerFactoryService } from 'src/modules/network-managers/netwo
 import { GetInvoicesDto } from '../dto/get-invoices.dto';
 import { BankProductFactoryService } from 'src/modules/bank-connectors/bank-product-factory.service';
 import { AutomaticBalanceRegistrationService } from './automatic-balance-registration.service';
+import { processPayment } from 'src/modules/bank-connectors/interfaces/bank-product.interface';
 
 @Injectable()
 export class UserInvoicesService {
@@ -23,6 +24,7 @@ export class UserInvoicesService {
    * @returns - Facturas del usuario
    */
   async getInvoices(filters: GetInvoicesDto) {
+    console.log('filters de getInvoices: ', filters);
     const { id, status, limit } = filters;
     try {
       const user = await this.prisma.user.findUnique({
@@ -140,7 +142,7 @@ export class UserInvoicesService {
     expectedAmount: number;
     allowPartialPayment: boolean;
     productType: bank_products_name;
-    paymentData: any;
+    paymentData: processPayment;
     invoices: { id: string; amount: number }[];
     balanceApplied?: number;
   }): Promise<any> {
@@ -188,19 +190,20 @@ export class UserInvoicesService {
         bankCode,
         productType,
       );
-      const paymentResult = await bankProduct.processPayment(paymentData);
+      const paymentResult = await bankProduct.processPayment({
+        ...paymentData,
+        clientProfileId: userId,
+      });
 
       if (!paymentResult.success) {
-        throw new CustomException({
-          message: paymentResult.errorMessage,
-          statusCode: HttpStatus.BAD_REQUEST,
-          errorCode: ErrorCode.PAYMENT_PROCESSING_ERROR,
-        });
+        return paymentResult;
       }
 
       const totalReceived = Number(
         (paymentResult.amount + (balanceApplied || 0)).toFixed(2),
       );
+      console.log('totalReceived: ', totalReceived);
+      console.log('expectedAmount: ', expectedAmount);
 
       // 3. Si el monto es menor al esperado, registrar el saldo automáticamente
       if (totalReceived < expectedAmount) {
@@ -236,11 +239,17 @@ export class UserInvoicesService {
 
       // 4. Verificar si el saldo aplicado es suficiente
       if (balanceApplied) {
+        const balanceToCalculate =
+          paymentResult.currency === 'USD'
+            ? balanceApplied
+            : balanceApplied / paymentData.exchangeRate;
+
         const balanceVerification =
           await this.automaticBalanceRegistrationService.verifyAvailableBalance(
             user.client_profile.id,
-            balanceApplied,
+            balanceToCalculate,
           );
+        console.log('balanceVerification: ', balanceVerification);
 
         // Aqui deberia poder guardar el valor de la transaccion como balance
 
@@ -291,7 +300,7 @@ export class UserInvoicesService {
             data: {
               transaction_id: paymentResult.transactionId,
               invoice_id: invoice.id,
-              client_profile_id: user.client_profile.id,
+              // client_profile_id: user.client_profile.id,
               payment_type: payment_type.BANK_TRANSACTION,
               amount: paymentResult.amount,
               network_manager: user.client_profile.isp.network_manager.name,
@@ -338,19 +347,7 @@ export class UserInvoicesService {
       const transaction = await this.prisma.transactions.findUnique({
         where: { id: parseInt(transactionId) },
         include: {
-          invoice_payments: {
-            include: {
-              client_profile: {
-                include: {
-                  isp: {
-                    include: {
-                      network_manager: true,
-                    },
-                  },
-                },
-              },
-            },
-          },
+          invoice_payments: true,
         },
       });
 
@@ -449,12 +446,8 @@ export class UserInvoicesService {
                 },
               },
             },
-            invoice_payments: {
-              select: {
-                client_profile: true,
-                invoice_data: true,
-              },
-            },
+            invoice_payments: true,
+            client_balance: true,
           },
           orderBy: {
             created_at: 'desc',

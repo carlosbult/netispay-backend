@@ -3,20 +3,23 @@ model banks {
   name         String
   code         String         @unique
   bank_product bank_product[]
+  otp_guides   otp_guide[]
 }
 
 model bank_product {
-  id               Int                          @id @default(autoincrement())
-  bank_id          Int
-  banks            banks                        @relation(fields: [bank_id], references: [id])
-  name             bank_products_name
-  payment_category payment_category?
-  is_active        Boolean                      @default(false)
-  api_url          String?
-  api_key          String?
-  api_secret       String?
-  transactions     transactions[]
-  configurations   bank_product_configuration[]
+  id                           Int                          @id @default(autoincrement())
+  bank_id                      Int
+  banks                        banks                        @relation(fields: [bank_id], references: [id])
+  label                        String?                      @default("")
+  name                         bank_products_name
+  payment_category             payment_category?
+  is_active                    Boolean                      @default(false)
+  api_url                      String?
+  api_key                      String?
+  api_secret                   String?
+  transactions                 transactions[]
+  configurations               bank_product_configuration[]
+  bank_product_specific_config bank_product_properties[]
 }
 
 model bank_product_configuration {
@@ -29,6 +32,18 @@ model bank_product_configuration {
   currency             currencies
 }
 
+model bank_product_properties {
+  id              Int          @id @default(autoincrement())
+  bank_product_id Int
+  bank_product    bank_product @relation(fields: [bank_product_id], references: [id])
+  property_key    String // Ej: 'telefono_pagador'
+  property_value  String
+  title           String
+  description     String?
+
+  @@unique([bank_product_id, property_key])
+}
+
 model dolar_rate {
   id            Int            @id @default(autoincrement())
   bcv_rate      Float
@@ -38,23 +53,31 @@ model dolar_rate {
 }
 
 model transactions {
-  id               Int                @id @default(autoincrement())
-  bank_product_id  Int
-  bank_product     bank_product       @relation(fields: [bank_product_id], references: [id])
-  dolar_rate_id    Int
-  dolar_rate       dolar_rate         @relation(fields: [dolar_rate_id], references: [id])
-  bank_reference   String?
-  intermediate_id  String?
-  amount           Float              @map("amount")
-  currency         currencies
-  payment_status   payment_status
-  error_code       String?
-  error_message    String?
-  bank_response    Json
-  month_year       String
-  created_at       DateTime           @default(now())
-  invoice_payments invoice_payments[]
-  client_balance   client_balance[]
+  id                Int                @id @default(autoincrement())
+  bank_product_id   Int
+  bank_product      bank_product       @relation(fields: [bank_product_id], references: [id])
+  dolar_rate_id     Int
+  dolar_rate        dolar_rate         @relation(fields: [dolar_rate_id], references: [id])
+  bank_reference    String?
+  intermediate_id   String?
+  amount            Float              @map("amount")
+  currency          currencies
+  payment_status    payment_status
+  error_code        String?
+  error_message     String?
+  bank_response     Json
+  month_year        String
+  client_profile_id Int?
+  admin_profile_id  Int?
+  created_at        DateTime           @default(now())
+  invoice_payments  invoice_payments[]
+  client_balance    client_balance[]
+
+  client_profile client_profile? @relation(fields: [client_profile_id], references: [id])
+  admin_profile  admin_profile?  @relation(fields: [admin_profile_id], references: [id])
+
+  @@index([client_profile_id])
+  @@index([admin_profile_id])
 }
 
 model commission_tiers {
@@ -77,26 +100,25 @@ model monthly_commission_summary {
 }
 
 model invoice_payments {
-  id                Int          @id @default(autoincrement())
-  invoice_id        String
-  transaction_id    Int
-  network_manager   String
-  payment_type      payment_type
-  amount            Float
-  invoice_data      Json
-  client_profile_id Int?
-  admin_profile_id  Int?
-  created_at        DateTime     @default(now())
+  id              Int          @id @default(autoincrement())
+  invoice_id      String
+  transaction_id  Int
+  network_manager String
+  payment_type    payment_type
+  amount          Float
+  invoice_data    Json
+  // client_profile_id Int?
+  // admin_profile_id  Int?
+  created_at      DateTime     @default(now())
 
-  client_profile   client_profile?    @relation(fields: [client_profile_id], references: [id])
-  admin_profile    admin_profile?     @relation(fields: [admin_profile_id], references: [id])
+  // client_profile   client_profile?    @relation(fields: [client_profile_id], references: [id])
+  // admin_profile    admin_profile?     @relation(fields: [admin_profile_id], references: [id])
   balance_movement balance_movement[]
-  transactions     transactions?      @relation(fields: [transactionsId], references: [id])
-  transactionsId   Int?
+  transactions     transactions?      @relation(fields: [transaction_id], references: [id])
+  // @@index([client_profile_id])
+  // @@index([admin_profile_id])
 
   @@index([invoice_id])
-  @@index([client_profile_id])
-  @@index([admin_profile_id])
 }
 
 model client_balance {
@@ -130,4 +152,19 @@ model balance_movement {
 
   @@index([client_balance_id])
   @@index([invoice_payment_id])
+}
+
+model otp_guide {
+  id             Int             @id @default(autoincrement())
+  bank_id        Int
+  bank           banks           @relation(fields: [bank_id], references: [id])
+  method_type    otp_method_type
+  channel        otp_channel
+  title          String // Ej: "Cómo generar tu clave OTP por SMS"
+  description    String // Descripción corta
+  steps          Json // Pasos detallados en formato estructurado
+  example_image  String? // URL de imagen demostrativa
+  help_contact   String // Ej: "Contactar al 0500-OTPMERCANTIL"
+  effective_date DateTime // Fecha de vigencia de la guía
+  version        String // Versión del instructivo
 }

@@ -1,34 +1,37 @@
 import { Injectable, Inject, HttpStatus } from '@nestjs/common';
-import { PrismaService } from 'prisma/prisma.service';
-import { BankProductFactory } from '../../interfaces/bank-product-factory.interface';
-import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { EncryptionService } from 'src/modules/encryption/encryption.service';
+import { BankProductFactory } from '../../interfaces/bank-product-factory.interface';
 import { BankProduct } from '../../interfaces/bank-product.interface';
-import { BinanceTransactionService } from './transaction.service';
+import { BancoPlazaC2PService } from './c2p.service';
+import { BancoPlazaAdapter } from '../banco-plaza.adapter';
 import { CustomException } from 'src/common/exceptions/custom-exception';
 import { ErrorCode } from 'src/interfaces/errorCodes';
+import { Cache } from 'cache-manager';
+import { EncryptionService } from 'src/modules/encryption/encryption.service';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
-export class BinanceFactoryService implements BankProductFactory {
+export class BancoPlazaFactoryService implements BankProductFactory {
   constructor(
     @Inject(CACHE_MANAGER) private cacheManager: Cache,
     private encryptionService: EncryptionService,
     private prismaService: PrismaService,
+    private bancoPlazaAdapter: BancoPlazaAdapter,
   ) {}
 
   createProduct(type: string): BankProduct {
     try {
       switch (type) {
-        case 'VERIFICATION_API':
-          return new BinanceTransactionService(
+        case 'C2P':
+          return new BancoPlazaC2PService(
             this.prismaService,
             this.encryptionService,
             this.cacheManager,
+            this.bancoPlazaAdapter,
           );
         default:
           throw new CustomException({
-            message: 'Producto Binance no registrado',
+            message: 'Bank product not registered',
             statusCode: HttpStatus.NOT_FOUND,
             errorCode: ErrorCode.NOT_FOUND,
           });
