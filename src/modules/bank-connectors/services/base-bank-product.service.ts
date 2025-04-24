@@ -1,5 +1,5 @@
-import { Injectable, Inject, HttpStatus } from '@nestjs/common';
 import { PrismaService } from 'prisma/prisma.service';
+import { Injectable, Inject, HttpStatus } from '@nestjs/common';
 import { bank_products_name, currencies, payment_status } from '@prisma/client';
 import { EncryptionService } from 'src/modules/encryption/encryption.service';
 import { Cache } from 'cache-manager';
@@ -130,13 +130,13 @@ export abstract class BaseBankProductService implements BankProduct {
           //     id: data.adminId,
           //   },
           // },
-          client_profile: data.clientProfileId
-            ? {
-                connect: {
-                  user_id: data.clientProfileId, // Cambiar 'id' por 'user_id'
-                },
-              }
-            : undefined,
+          //   client_profile: data.clientProfileId
+          //     ? {
+          //         connect: {
+          //           user_id: data.clientProfileId, // Cambiar 'id' por 'user_id'
+          //         },
+          //       }
+          //     : undefined,
         },
       });
     } catch (error) {
