@@ -53,7 +53,7 @@ export class DolarRateScraper {
       // Obtener ambas tasas en una sola evaluación
       const rates = await this.page.evaluate(() => {
         const elements = document.querySelectorAll(
-          '.border-2.rounded-lg.shadow.p-2.text-center.overflow-hidden',
+          '.border-2.rounded-lg.shadow.p-2.text-center',
         );
 
         // Convertir NodeList a Array para usar map
@@ -66,12 +66,12 @@ export class DolarRateScraper {
           })
           .reduce(
             (acc, { title, rate }) => {
-              if (title.includes('@EnParaleloVzla3')) {
-                acc.parallelRate = parseFloat(
+              if (title.includes('Dólar BCV (Oficial)')) {
+                acc.bcvRate = parseFloat(
                   rate.replace('Bs = ', '').replace(',', '.'),
                 );
-              } else if (title.includes('BCV (Oficial)')) {
-                acc.bcvRate = parseFloat(
+              } else if (title.includes('Dólar Paralelo')) {
+                acc.parallelRate = parseFloat(
                   rate.replace('Bs = ', '').replace(',', '.'),
                 );
               }
