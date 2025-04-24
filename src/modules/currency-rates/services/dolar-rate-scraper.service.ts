@@ -50,11 +50,13 @@ export class DolarRateScraper {
         waitUntil: 'networkidle0',
       });
 
-      // Obtener ambas tasas en una sola evaluación
+      // Obtener ambas tasas en una sola evaluación con la nueva estructura HTML
       const rates = await this.page.evaluate(() => {
         const elements = document.querySelectorAll(
           '.border-2.rounded-lg.shadow.p-2.text-center',
         );
+        let bcvRate = null;
+        let parallelRate = null;
 
         // Convertir NodeList a Array para usar map
         return Array.from(elements)
@@ -79,6 +81,15 @@ export class DolarRateScraper {
             },
             { parallelRate: null, bcvRate: null },
           );
+
+          if (title.includes('Dólar BCV (Oficial)')) {
+            bcvRate = rate;
+          } else if (title.includes('Dólar Paralelo')) {
+            parallelRate = rate;
+          }
+        });
+
+        return { bcvRate, parallelRate };
       });
 
       if (
